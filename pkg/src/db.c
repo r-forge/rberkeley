@@ -87,7 +87,47 @@ SEXP do_db_del(SEXP _dbp, SEXP _key)
 /* }}} */
 /* do_db_err */
 /* do_db_errx */
-/* do_db_exists */
+/* {{{ do_db_exists */
+SEXP do_db_exists (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
+{
+  DB *dbp;
+  DB_TXN *txnid;
+  DBT key;
+  u_int32_t flags;
+  int ret;
+
+  if(TYPEOF(_flags) == INTSXP)
+    flags = (u_int32_t)INTEGER(_flags)[0];
+  else flags=0;
+
+  flags = 0;
+
+  switch(TYPEOF(_key)) {
+    case STRSXP:
+      key.data = (char *)CHAR(STRING_ELT(_key, 0));
+      key.size = strlen(key.data)+1;
+      break;
+    default:
+    error("unsupported key type");
+  } 
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+    ret = dbp->exists(dbp, txnid, &key, flags);
+  } else {
+    ret = dbp->exists(dbp, NULL,  &key, flags);
+  }
+  
+  if(ret == DB_NOTFOUND)
+    return mkString("DB_NOTFOUND");
+  if(ret == DB_KEYEMPTY)
+    return mkString("DB_KEYEMPTY");
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* {{{ do_db_fd */
 SEXP do_db_fd (SEXP _dbp)
 {
@@ -110,13 +150,26 @@ SEXP do_db_get(SEXP _dbp, SEXP _key)
 
   memset(&key, 0, sizeof(key));
   memset(&data, 0, sizeof(data));
-  key.data = (char *)CHAR(STRING_ELT(_key,0));
-  key.size = strlen(key.data)+1; //LENGTH(STRING_ELT(_key,0));
+
+  switch(TYPEOF(_key)) {
+    case STRSXP:
+      key.data = (char *)CHAR(STRING_ELT(_key,0));
+      key.size = strlen(key.data)+1;
+      break;
+    case RAWSXP:
+      key.data = (unsigned char *)RAW(_key);
+      key.size = length(_key);
+      break;
+  }
 
   dbp = R_ExternalPtrAddr(_dbp);
 
   if ((ret = dbp->get(dbp, NULL, &key, &data, 0)) == 0) {
-    return mkString(data.data);
+    SEXP retdata;
+    PROTECT(retdata = allocVector(RAWSXP, data.size));
+    memcpy(RAW(retdata), data.data, data.size);
+    UNPROTECT(1);
+    return retdata;
   } else {
     dbp->err(dbp, ret, "DB->get");
     return R_NilValue;
@@ -169,25 +222,44 @@ SEXP do_db_open (SEXP _dbp, SEXP _dbenvp)
 }
 /* }}} */
 /* {{{ do_db_put */
-SEXP do_db_put(SEXP _dbp, SEXP _key, SEXP _value)
+SEXP do_db_put(SEXP _dbp, SEXP _key, SEXP _data)
 {
   DB *dbp;
   DBT key, data;
   int ret;
 
-	memset(&key, 0, sizeof(key));
-	memset(&data, 0, sizeof(data));
-	key.data = (char *)CHAR(STRING_ELT(_key,0));
-	key.size = strlen(key.data)+1;
-	data.data = (char *)CHAR(STRING_ELT(_value,0));
-	data.size = strlen(data.data)+1;
+  memset(&key, 0, sizeof(key));
+  memset(&data, 0, sizeof(data));
+
+  switch(TYPEOF(_key)) {
+    case STRSXP:
+      key.data = (char *)CHAR(STRING_ELT(_key,0));
+      key.size = strlen(key.data)+1;
+      break;
+    case RAWSXP:
+      key.data = (unsigned char *)RAW(_key);
+      key.size = length(_key);
+      break;
+  }
+  switch(TYPEOF(_data)) {
+/* need to memcpy for this to work I assume... */
+    case STRSXP:
+      data.data = (char *)CHAR(STRING_ELT(_data,0));
+      data.size = strlen(data.data)+1;
+      break;
+    case RAWSXP:
+      data.data = (unsigned char *)RAW(_data);
+      data.size = length(_data);
+  }
 
   dbp = R_ExternalPtrAddr(_dbp);
 
+Rprintf("data.size: %i\n", data.size);
+Rprintf("key.size: %i\n", key.size);
 	/* Store a key/data pair. */
-	if ((ret = dbp->put(dbp, NULL, &key, &data, 0)) == 0)
-		Rprintf("db: %s: key stored.\n", (char *)key.data);
-	else {
+	if ((ret = dbp->put(dbp, NULL, &key, &data, 0)) == 0) {
+		/*Rprintf("db: %s: key stored.\n", (char *)key.data);*/
+	} else {
 		dbp->err(dbp, ret, "DB->put");
 	}
     return R_NilValue;
