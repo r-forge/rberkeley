@@ -102,6 +102,8 @@ SEXP rberkeley_db_exists (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
   u_int32_t flags;
   int ret;
 
+  memset(&key, 0, sizeof(DBT));
+
   if(TYPEOF(_flags) == INTSXP)
     flags = (u_int32_t)INTEGER(_flags)[0];
   else flags=0;
@@ -113,6 +115,10 @@ SEXP rberkeley_db_exists (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
       key.data = (char *)CHAR(STRING_ELT(_key, 0));
       key.size = strlen(key.data)+1;
       break;
+    case RAWSXP:
+      key.data = (unsigned char *)RAW(_key);
+      key.size = length(_key);
+      break;
     default:
     error("unsupported key type");
   } 
@@ -123,7 +129,7 @@ SEXP rberkeley_db_exists (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
     txnid = R_ExternalPtrAddr(_txnid);
     ret = dbp->exists(dbp, txnid, &key, flags);
   } else {
-    ret = dbp->exists(dbp, NULL,  &key, flags);
+    ret = dbp->exists(dbp, NULL,  &key, 0);
   }
   
   if(ret == DB_NOTFOUND)
@@ -183,6 +189,43 @@ SEXP rberkeley_db_get(SEXP _dbp, SEXP _key)
 }
 /* }}} */
 /* rberkeley_db_get_byteswapped */
+/* {{{ rberkeley_db_get_dbname */
+SEXP rberkeley_db_get_dbname (SEXP _dbh)
+{
+  DB *dbh;
+  const char *filenamep, *dbnamep;
+  int ret;
+  SEXP names, getnames;
+  PROTECT(getnames = allocVector(VECSXP, 2));
+
+  dbh = R_ExternalPtrAddr(_dbh);
+  ret = dbh->get_dbname(dbh, &filenamep, &dbnamep);
+
+  if(ret==0) {
+    if(filenamep) {
+      SET_VECTOR_ELT(getnames, 0, mkString(filenamep));
+    } else {
+      SET_VECTOR_ELT(getnames, 0, R_NilValue);
+    }
+    if(dbnamep) {
+      SET_VECTOR_ELT(getnames, 1, mkString(dbnamep));
+    } else {
+      SET_VECTOR_ELT(getnames, 1, R_NilValue);
+    }
+    PROTECT(names = allocVector(STRSXP, 2));
+    SET_STRING_ELT(names, 0, mkChar("filename")); 
+    SET_STRING_ELT(names, 1, mkChar("dbname")); 
+    setAttrib(getnames, R_NamesSymbol, names);
+  } else {
+    return R_NilValue;
+  }
+  UNPROTECT(2);
+  return getnames;
+}
+/* }}} */
+/* rberkeley_db_get_multiple */
+/* rberkeley_db_get_open_flags */
+/* rberkeley_db_get_transactional */
 /* {{{ rberkeley_db_get_type */
 SEXP rberkeley_db_get_type (SEXP _dbp)
 {
@@ -209,7 +252,6 @@ SEXP rberkeley_db_get_type (SEXP _dbp)
   }
 }
 /* }}} */
-
 /* rberkeley_db_join */
 /* rberkeley_db_key_range */
 /* {{{ rberkeley_db_open */
