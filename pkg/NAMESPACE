@@ -1,2 +1,30 @@
 useDynLib(RBerkeley)
 
+export(
+        ### Utility ###
+        mkFlags,
+
+        ### Database ###
+        db_create,
+        db_open,
+        db_close,
+
+        db_put,
+        db_get,
+
+        db_set_cachesize,
+        db_get_cachesize,
+        db_set_pagesize,
+        db_get_pagesize,
+
+        db_get_byteswapped,
+
+        db_set_encrypt,
+
+        db_set_lorder,
+        db_get_lorder,
+
+        ### Environments ###
+        db_env_create
+      )
+
