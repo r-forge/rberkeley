@@ -543,6 +543,103 @@ SEXP mkFlags (SEXP _flags)
     }  else
     if(strcmp(cur_string,"DB_YIELDCPU")==0) {
       flags_bit = flags_bit | DB_YIELDCPU; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_CURRENT")==0) {
+      flags_bit = flags_bit | DB_CURRENT; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_FIRST")==0) {
+      flags_bit = flags_bit | DB_FIRST; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_GET_BOTH")==0) {
+      flags_bit = flags_bit | DB_GET_BOTH; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_GET_BOTH_RANGE")==0) {
+      flags_bit = flags_bit | DB_GET_BOTH_RANGE; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_GET_RECNO")==0) {
+      flags_bit = flags_bit | DB_GET_RECNO; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_JOIN_ITEM")==0) {
+      flags_bit = flags_bit | DB_JOIN_ITEM; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_LAST")==0) {
+      flags_bit = flags_bit | DB_LAST; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_NEXT")==0) {
+      flags_bit = flags_bit | DB_NEXT; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_NEXT_DUP")==0) {
+      flags_bit = flags_bit | DB_NEXT_DUP; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_NEXT_NODUP")==0) {
+      flags_bit = flags_bit | DB_NEXT_NODUP; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_PREV")==0) {
+      flags_bit = flags_bit | DB_PREV; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_PREV_DUP")==0) {
+      flags_bit = flags_bit | DB_PREV_DUP; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_PREV_NODUP")==0) {
+      flags_bit = flags_bit | DB_PREV_NODUP; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_SET")==0) {
+      flags_bit = flags_bit | DB_SET; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_SET_RANGE")==0) {
+      flags_bit = flags_bit | DB_SET_RANGE; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_SET_RECNO")==0) {
+      flags_bit = flags_bit | DB_SET_RECNO; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_IGNORE_LEASE")==0) {
+      flags_bit = flags_bit | DB_IGNORE_LEASE; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_READ_UNCOMMITTED")==0) {
+      flags_bit = flags_bit | DB_READ_UNCOMMITTED; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_MULTIPLE")==0) {
+      flags_bit = flags_bit | DB_MULTIPLE; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_MULTIPLE_KEY")==0) {
+      flags_bit = flags_bit | DB_MULTIPLE_KEY; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_RMW")==0) {
+      flags_bit = flags_bit | DB_RMW; continue; 
+    }  else
+    /* CURSOR FLAGS */
+    if(strcmp(cur_string,"DB_AFTER")==0) {
+      flags_bit = flags_bit | DB_AFTER; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_BEFORE")==0) {
+      flags_bit = flags_bit | DB_BEFORE; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_CURRENT")==0) {
+      flags_bit = flags_bit | DB_CURRENT; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_KEYFIRST")==0) {
+      flags_bit = flags_bit | DB_KEYFIRST; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_KEYLAST")==0) {
+      flags_bit = flags_bit | DB_KEYLAST; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_NODUPDATA")==0) {
+      flags_bit = flags_bit | DB_NODUPDATA; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_PRIORITY_VERY_LOW")==0) {
+      flags_bit = flags_bit | DB_PRIORITY_VERY_LOW; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_PRIORITY_LOW")==0) {
+      flags_bit = flags_bit | DB_PRIORITY_LOW; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_PRIORITY_DEFAULT")==0) {
+      flags_bit = flags_bit | DB_PRIORITY_DEFAULT; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_PRIORITY_HIGH")==0) {
+      flags_bit = flags_bit | DB_PRIORITY_HIGH; continue; 
+    }  else
+    if(strcmp(cur_string,"DB_PRIORITY_VERY_HIGH")==0) {
+      flags_bit = flags_bit | DB_PRIORITY_VERY_HIGH; continue; 
     } else {
       warning("unknown constant %s", cur_string);
     }

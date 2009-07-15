@@ -360,11 +360,14 @@ SEXP rberkeley_db_put(SEXP _dbp, SEXP _key, SEXP _data)
 
   dbp = R_ExternalPtrAddr(_dbp);
 
+/*
 Rprintf("data.size: %i\n", data.size);
 Rprintf("key.size: %i\n", key.size);
+*/
 	/* Store a key/data pair. */
 	if ((ret = dbp->put(dbp, NULL, &key, &data, 0)) == 0) {
 		/*Rprintf("db: %s: key stored.\n", (char *)key.data);*/
+        return ScalarInteger(ret);
 	} else {
 		dbp->err(dbp, ret, "DB->put");
 	}

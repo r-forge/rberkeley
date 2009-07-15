@@ -4,11 +4,23 @@ export(
         ### Utility ###
         mkFlags,
 
+        ### Cursor ###
+        db_cursor,
+        dbcursor_close,
+        dbcursor_del,
+        dbcursor_dup,
+        dbcursor_get,
+        dbcursor_put,
+        dbcursor_set_priority,
+        dbcursor_get_priority,
+
         ### Database ###
         db_create,
         db_open,
         db_close,
+        db_truncate,
 
+        db_exists,
         db_put,
         db_get,
 

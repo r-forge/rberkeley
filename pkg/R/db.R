@@ -32,6 +32,17 @@ db_get <- function(dbh, key)
   .Call("rberkeley_db_get", dbh, key)
 }
 
+db_exists <- function(dbh, txnid=NULL, key, flags=0L)
+{
+  if(!is.raw(key))
+    key <- serialize(key, NULL)
+  .Call("rberkeley_db_exists", dbh, txnid, key, flags)
+}
+
+db_truncate <- function(dhh)
+{
+
+}
 db_get_byteswapped <- function(dbh)
 {
   if(check_pointer(dbh))
