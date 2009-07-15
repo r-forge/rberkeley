@@ -52,7 +52,7 @@ SEXP rberkeley_db_create (SEXP _dbenv)
     ret = db_create(&dbp, dbenv, 0);
   }
   if(ret==0)
-    return R_MakeExternalPtr(dbp, R_NilValue, R_NilValue);
+    return R_MakeExternalPtr(dbp, install("DBconnection"), R_NilValue);
   return ScalarInteger(ret);
 }
 /* }}} */
@@ -65,6 +65,9 @@ SEXP rberkeley_db_close(SEXP _dbp)
 
   dbp = R_ExternalPtrAddr(_dbp);
   ret = dbp->close(dbp, 0);
+  if(ret == 0)
+    R_ClearExternalPtr(_dbp);
+
   return(ScalarInteger(ret));
 }
 /* }}} */
@@ -188,18 +191,33 @@ SEXP rberkeley_db_get(SEXP _dbp, SEXP _key)
   }
 }
 /* }}} */
-/* rberkeley_db_get_byteswapped */
-/* {{{ rberkeley_db_get_dbname */
-SEXP rberkeley_db_get_dbname (SEXP _dbh)
+/* {{{ rberkeley_db_get_byteswapped */
+SEXP rberkeley_db_get_byteswapped (SEXP _dbp)
 {
-  DB *dbh;
+  DB *dbp;
+  int ret, isswapped;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  ret = dbp->get_byteswapped(dbp, &isswapped);
+
+  if(ret != 0)
+    return ScalarInteger(ret);
+
+  return ScalarInteger(isswapped); 
+}
+/* }}} */
+/* {{{ rberkeley_db_get_dbname */
+SEXP rberkeley_db_get_dbname (SEXP _dbp)
+{
+  DB *dbp;
   const char *filenamep, *dbnamep;
   int ret;
   SEXP names, getnames;
   PROTECT(getnames = allocVector(VECSXP, 2));
 
-  dbh = R_ExternalPtrAddr(_dbh);
-  ret = dbh->get_dbname(dbh, &filenamep, &dbnamep);
+  dbp = R_ExternalPtrAddr(_dbp);
+  ret = dbp->get_dbname(dbp, &filenamep, &dbnamep);
 
   if(ret==0) {
     if(filenamep) {
@@ -223,8 +241,32 @@ SEXP rberkeley_db_get_dbname (SEXP _dbh)
   return getnames;
 }
 /* }}} */
-/* rberkeley_db_get_multiple */
-/* rberkeley_db_get_open_flags */
+/* {{{ rberkeley_db_get_multiple */
+SEXP rberkeley_db_get_multiple (SEXP _dbp) {
+  DB *dbp;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  ret = dbp->get_multiple(dbp);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
+/* {{{ rberkeley_db_get_open_flags */
+SEXP rberkeley_db_get_open_flags (SEXP _dbp)
+{
+  DB *dbp;
+  u_int32_t flagsp;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  ret = dbp->get_open_flags(dbp, &flagsp);
+
+  return ScalarInteger(flagsp);
+}
+/* }}} */
 /* rberkeley_db_get_transactional */
 /* {{{ rberkeley_db_get_type */
 SEXP rberkeley_db_get_type (SEXP _dbp)
@@ -255,13 +297,20 @@ SEXP rberkeley_db_get_type (SEXP _dbp)
 /* rberkeley_db_join */
 /* rberkeley_db_key_range */
 /* {{{ rberkeley_db_open */
-SEXP rberkeley_db_open (SEXP _dbp, SEXP _txnid, SEXP _file /*,
-                       SEXP _database, SEXP _type, SEXP _flags,
-                       SEXP _mode*/)
+SEXP rberkeley_db_open (SEXP _dbp, 
+                        SEXP _txnid, 
+                        SEXP _file,
+                        /*
+                        SEXP _database, 
+                        SEXP _type,
+                        */
+                        SEXP _flags/*,
+                        SEXP _mode*/)
 {
 	DB *dbp;
     DB_TXN *txnid;
 	int ret;
+    u_int32_t flags = INTEGER(_flags)[0];
 
     dbp = R_ExternalPtrAddr(_dbp);
 
@@ -272,7 +321,7 @@ SEXP rberkeley_db_open (SEXP _dbp, SEXP _txnid, SEXP _file /*,
     const char * file = CHAR(STRING_ELT(_file,0));
 
 	if ((ret = dbp->open(dbp,
-	    NULL, file, NULL, DB_BTREE, DB_CREATE, 0664)) != 0) {
+	    NULL, file, NULL, DB_BTREE, flags, 0664)) != 0) {
 		dbp->err(dbp, ret, "%s", DATABASE);
 	}
     return ScalarInteger(ret);
@@ -395,10 +444,67 @@ SEXP rberkeley_db_truncate (SEXP _dbp, SEXP _txnid)
 /* rberkeley_db_verify */
 
 /*** Database Configuration ***/
-/* rberkeley_db_set_alloc   */
-/* rberkeley_db_set_cachesize */
+/* {{{ rberkeley_db_set_alloc   */
+/* }}} */
+/* {{{ rberkeley_db_set_cachesize */
+SEXP rberkeley_db_set_cachesize (SEXP _dbp, SEXP _gbytes,
+                                 SEXP _bytes, SEXP _ncache)
+{
+  DB *dbp;
+  int ncache, ret;
+  u_int32_t gbytes, bytes;
+
+  gbytes = (u_int32_t)INTEGER(_gbytes)[0];
+   bytes = (u_int32_t)INTEGER(_bytes)[0];
+  ncache = (int)INTEGER(_ncache)[0];
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  ret = dbp->set_cachesize(dbp, gbytes, bytes, ncache);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
+/* {{{ rberkeley_db_get_cachesize */
+SEXP rberkeley_db_get_cachesize (SEXP _dbp)
+{
+  DB *dbp;
+  int ncachep, ret;
+  u_int32_t gbytesp, bytesp;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  ret = dbp->get_cachesize(dbp, &gbytesp, &bytesp, &ncachep);
+
+  if(ret != 0)
+    return ScalarInteger(ret);
+
+  SEXP result;
+  PROTECT(result = allocVector(VECSXP, 3));
+  SET_VECTOR_ELT(result, 0, ScalarInteger(gbytesp));
+  SET_VECTOR_ELT(result, 1, ScalarInteger(bytesp));
+  SET_VECTOR_ELT(result, 2, ScalarInteger(ncachep));
+  UNPROTECT(1);
+  return result;
+}
+/* }}} */
 /* rberkeley_db_set_dup_compare */
-/* rberkeley_db_set_encrypt */
+/* {{{ rberkeley_db_set_encrypt */
+SEXP rberkeley_db_set_encrypt (SEXP _dbp, SEXP _passwd, SEXP _flags)
+{
+  DB *dbp;
+  int ret;
+  const char * passwd;
+  u_int32_t flags;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  passwd = CHAR(STRING_ELT(_passwd, 0));
+  flags  = INTEGER(_flags)[0];
+
+  ret = dbp->set_encrypt(dbp, passwd, flags);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* rberkeley_db_set_errcall */
 /* rberkeley_db_set_msgcall  */
 /* rberkeley_db_set_errfile */
@@ -406,8 +512,67 @@ SEXP rberkeley_db_truncate (SEXP _dbp, SEXP _txnid)
 /* rberkeley_db_set_errpfx */
 /* rberkeley_db_set_feedback */
 /* rberkeley_db_set_flags */
-/* rberkeley_db_set_lorder */
-/* rberkeley_db_set_pagesize */
+/* {{{ rberkeley_db_set_lorder */
+SEXP rberkeley_db_set_lorder (SEXP _dbp, SEXP _lorder)
+{
+  DB *dbp;
+  int ret;
+  int lorder;
+  lorder = INTEGER(_lorder)[0];
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  ret = dbp->set_lorder(dbp, lorder);
+  return ScalarInteger(ret);
+}
+/* }}} */
+/* {{{ rberkeley_db_get_lorder */
+SEXP rberkeley_db_get_lorder (SEXP _dbp)
+{
+  DB *dbp;
+  int ret;
+  int lorder;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  ret = dbp->get_lorder(dbp, &lorder);
+  if(ret != 0) 
+    return ScalarInteger(ret);
+  return ScalarInteger(lorder);
+}
+/* }}} */
+/* {{{ rberkeley_db_set_pagesize */
+SEXP rberkeley_db_set_pagesize (SEXP _dbp, SEXP _pagesize)
+{
+  DB *dbp;
+  int ret;
+  u_int32_t pagesize;
+
+  pagesize = INTEGER(_pagesize)[0];
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  ret = dbp->set_pagesize(dbp, pagesize);
+  
+  return ScalarInteger(ret); 
+}
+/* }}} */
+/* {{{ rberkeley_db_get_pagesize */
+SEXP rberkeley_db_get_pagesize (SEXP _dbp)
+{
+  DB *dbp;
+  int ret;
+  u_int32_t pagesize;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+
+  ret = dbp->get_pagesize(dbp, &pagesize);
+  if(ret != 0)
+    return ScalarInteger(ret);
+
+  return ScalarInteger(pagesize);
+}
+/* }}} */
 
 /*** BTree/Recno Configuration ***/    
 /* rberkeley_db_set_append_recno */
