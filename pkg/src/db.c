@@ -411,7 +411,21 @@ SEXP rberkeley_db_rename (SEXP _dbp, SEXP _file, SEXP _database,
 /* }}} */
 /* rberkeley_db_set_priority */
 /* rberkeley_db_stat */
-/* rberkeley_db_stat_print */
+/* {{{ rberkeley_db_stat_print */
+SEXP rberkeley_db_stat_print (SEXP _dbp, SEXP _flags)
+{
+  DB *dbp;
+  u_int32_t flags;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbp->stat_print(dbp, flags);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* {{{ rberkeley_db_sync */
 SEXP rberkeley_db_sync(SEXP _dbp)
 {

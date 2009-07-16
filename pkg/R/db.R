@@ -102,3 +102,17 @@ db_get_lorder <- function(dbh)
    return("big.endian")
 }
 
+db_stat_print <- function(dbh, flags=0L)
+{
+  .Call("rberkeley_db_stat_print", dbh, as.integer(flags)) 
+}
+
+db_remove <- function(dbh, file, database)
+{
+  .Call("rberkeley_db_remove", dbh, file, database)
+}
+
+db_rename <- function(dbh, file, database, newname)
+{
+  .Call("rberkeley_db_rename", dbh, file, database, newname)
+}

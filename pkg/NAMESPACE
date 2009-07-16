@@ -19,6 +19,8 @@ export(
         db_open,
         db_close,
         db_truncate,
+        db_remove,
+        db_rename,
 
         db_exists,
         db_put,
@@ -30,6 +32,7 @@ export(
         db_get_pagesize,
 
         db_get_byteswapped,
+        db_stat_print,
 
         db_set_encrypt,
 
@@ -44,10 +47,13 @@ export(
         dbenv_get_open_flags,
         dbenv_close,
 
+        dbenv_stat_print,
         dbenv_set_cachesize,
         dbenv_get_cachesize,
         dbenv_set_data_dir,
         dbenv_get_data_dirs,
+        dbenv_set_tmp_dir,
+        dbenv_get_tmp_dir,
         dbenv_set_flags,
         dbenv_get_flags,
         dbenv_set_shm_key,
@@ -60,6 +66,10 @@ export(
         dbenv_mutex_free,
         dbenv_mutex_stat_print,
         dbenv_mutex_lock,
-        dbenv_mutex_unlock
+        dbenv_mutex_unlock,
+
+        ### Memory Pools ###
+        db_get_mpf,
+        dbenv_memp_stat_print
       )
 

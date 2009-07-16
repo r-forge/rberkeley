@@ -33,6 +33,16 @@ dbenv_get_data_dirs <- function(dbenv)
   .Call("rberkeley_dbenv_get_data_dirs", dbenv)
 }
 
+dbenv_set_tmp_dir <- function(dbenv, dir)
+{
+  .Call("rberkeley_dbenv_set_tmp_dir", dbenv, dir)
+}
+
+dbenv_get_tmp_dir <- function(dbenv)
+{
+  .Call("rberkeley_dbenv_get_tmp_dir", dbenv)
+}
+
 dbenv_set_flags <- function(dbenv, flags, onoff)
 {
   .Call("rberkeley_dbenv_set_flags", dbenv, flags, onoff)
@@ -83,6 +93,11 @@ dbenv_get_open_flags <- function(dbenv)
 dbenv_close <- function(dbenv, flags)
 {
   if(check_pointer(dbenv))
-  .Call("rberkeley_dbenv_close", dbenv, flags)
+    .Call("rberkeley_dbenv_close", dbenv, flags)
 }
 
+dbenv_stat_print <- function(dbenv, flags)
+{
+  if(check_pointer(dbenv))
+    .Call("rberkeley_dbenv_stat_print", dbenv, flags)
+}

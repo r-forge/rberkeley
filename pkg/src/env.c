@@ -175,6 +175,21 @@ SEXP rberkeley_dbenv_get_data_dirs (SEXP _dbenv)
   return mkString(*dirpp);  
 }
 /* }}} */
+/* {{{ rberkeley_dbenv_stat_print */
+SEXP rberkeley_dbenv_stat_print (SEXP _dbenv, SEXP _flags)
+{
+  DB_ENV *dbenv;
+  u_int32_t flags;
+  int ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbenv->stat_print(dbenv, flags);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* {{{ rberkeley_dbenv_set_flags */
 SEXP rberkeley_dbenv_set_flags (SEXP _dbenv, SEXP _flags, SEXP _onoff)
 {
@@ -263,5 +278,33 @@ SEXP rberkeley_dbenv_get_shm_key (SEXP _dbenv)
     return ScalarInteger(ret);
 
   return ScalarInteger((int)shm_key);  
+}
+/* }}} */
+/* {{{ rberkeley_dbenv_set_tmp_dir */
+SEXP rberkeley_dbenv_set_tmp_dir (SEXP _dbenv, SEXP _dir)
+{
+  DB_ENV *dbenv;
+  int ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  ret = dbenv->set_tmp_dir(dbenv, CHAR(STRING_ELT(_dir, 0)));
+
+  return ScalarInteger(ret); 
+}
+/* }}} */
+/* {{{ rberkeley_dbenv_get_tmp_dir */
+SEXP rberkeley_dbenv_get_tmp_dir (SEXP _dbenv)
+{
+  DB_ENV *dbenv;
+  const char * dirp;
+  int ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  ret = dbenv->get_tmp_dir(dbenv, &dirp);
+
+  if(ret != 0) 
+    return ScalarInteger(ret); 
+
+  return mkString(dirp);  
 }
 /* }}} */
