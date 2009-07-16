@@ -43,6 +43,26 @@ dbenv_get_flags <- function(dbenv)
   .Call("rberkeley_dbenv_get_flags", dbenv)
 }
 
+dbenv_set_intermediate_dir_mode <- function(dbenv, mode)
+{
+  .Call("rberkeley_dbenv_set_intermediate_dir_mode", dbenv, mode)
+}
+
+dbenv_get_intermediate_dir_mode <- function(dbenv)
+{
+  .Call("rberkeley_dbenv_get_intermediate_dir_mode", dbenv)
+}
+
+dbenv_set_shm_key <- function(dbenv, shm_key)
+{
+  .Call("rberkeley_dbenv_set_shm_key", dbenv, as.integer(shm_key))
+}
+
+dbenv_get_shm_key <- function(dbenv)
+{
+  .Call("rberkeley_dbenv_get_shm_key", dbenv)
+}
+
 dbenv_open <- function(dbenv, dbhome, flags, mode)
 {
   .Call("rberkeley_dbenv_open", dbenv, dbhome, flags, mode)

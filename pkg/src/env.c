@@ -207,3 +207,61 @@ SEXP rberkeley_dbenv_get_flags  (SEXP _dbenv)
   return ScalarInteger((int)flags);
 }
 /* }}} */
+/* {{{ rberkeley_dbenv_set_intermediate_dir_mode */
+SEXP rberkeley_dbenv_set_intermediate_dir_mode (SEXP _dbenv, SEXP _mode)
+{
+  DB_ENV *dbenv;
+  int ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  ret = dbenv->set_intermediate_dir_mode (dbenv, CHAR(STRING_ELT(_mode, 0)));
+
+  return ScalarInteger(ret); 
+}
+/* }}} */
+/* {{{ rberkeley_dbenv_get_intermediate_dir_mode */
+SEXP rberkeley_dbenv_get_intermediate_dir_mode (SEXP _dbenv)
+{
+  DB_ENV *dbenv;
+  const char * modep;
+  int ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  ret = dbenv->get_intermediate_dir_mode(dbenv, &modep);
+
+  if(ret != 0) 
+    return ScalarInteger(ret); 
+
+  return mkString(modep);  
+}
+/* }}} */
+/* {{{ rberkeley_dbenv_set_shm_key */
+SEXP rberkeley_dbenv_set_shm_key (SEXP _dbenv, SEXP _shm_key)
+{
+  DB_ENV *dbenv;
+  long shm_key;
+  int ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  shm_key = (long)INTEGER(_shm_key); /* would be better if we had longs in R ... atol? */
+  
+  ret = dbenv->set_shm_key(dbenv, shm_key);
+  return ScalarInteger(ret);
+}
+/* }}} */
+/* {{{ rberkeley_dbenv_get_shm_key */
+SEXP rberkeley_dbenv_get_shm_key (SEXP _dbenv)
+{
+  DB_ENV *dbenv;
+  long shm_key;
+  int ret;
+  
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  ret = dbenv->get_shm_key(dbenv, &shm_key);
+
+  if(ret != 0)
+    return ScalarInteger(ret);
+
+  return ScalarInteger((int)shm_key);  
+}
+/* }}} */

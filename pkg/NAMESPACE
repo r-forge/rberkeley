@@ -49,6 +49,16 @@ export(
         dbenv_set_data_dir,
         dbenv_get_data_dirs,
         dbenv_set_flags,
-        dbenv_get_flags
+        dbenv_get_flags,
+        dbenv_set_shm_key,
+        dbenv_get_shm_key,
+        dbenv_set_intermediate_dir_mode,
+        dbenv_get_intermediate_dir_mode,
+
+        ### Mutexes ###
+        dbenv_mutex_alloc,
+        dbenv_mutex_free,
+        dbenv_mutex_lock,
+        dbenv_mutex_unlock
       )
 
