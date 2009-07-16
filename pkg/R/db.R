@@ -1,5 +1,5 @@
-db_create <- function(dbenv=NULL) {
-  .Call("rberkeley_db_create", dbenv)
+db_create <- function(dbenv=NULL, flags=0L) {
+  .Call("rberkeley_db_create", dbenv, flags)
 }
 
 db_open <- function(dbh, file="access.db", flags=0L) {
@@ -102,6 +102,3 @@ db_get_lorder <- function(dbh)
    return("big.endian")
 }
 
-db_env_create <- function(flags) {
-  .Call("rberkeley_db_env_create", flags)
-}

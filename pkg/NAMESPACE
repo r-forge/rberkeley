@@ -37,6 +37,18 @@ export(
         db_get_lorder,
 
         ### Environments ###
-        db_env_create
+        db_env_create,
+        db_get_env,
+        dbenv_open,
+        dbenv_get_home,
+        dbenv_get_open_flags,
+        dbenv_close,
+
+        dbenv_set_cachesize,
+        dbenv_get_cachesize,
+        dbenv_set_data_dir,
+        dbenv_get_data_dirs,
+        dbenv_set_flags,
+        dbenv_get_flags
       )
 
