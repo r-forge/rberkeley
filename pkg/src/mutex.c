@@ -62,6 +62,21 @@ SEXP rberkeley_dbenv_mutex_lock (SEXP _dbenv, SEXP _mutex)
 /* }}} */
 /* {{{ rberkeley_dbenv_mutex_stat */
 /* }}} */
+/* {{{ rberkeley_dbenv_mutex_stat_print */
+SEXP rberkeley_dbenv_mutex_stat_print (SEXP _dbenv, SEXP _flags)
+{
+  DB_ENV *dbenv;
+  u_int32_t flags;
+  int ret;
+  
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  ret = dbenv->mutex_stat_print(dbenv, flags);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* {{{ rberkeley_dbenv_mutex_unlock */
 SEXP rberkeley_dbenv_mutex_unlock (SEXP _dbenv, SEXP _mutex)
 {
