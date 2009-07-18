@@ -3,6 +3,7 @@ useDynLib(RBerkeley)
 export(
         ### Utility ###
         mkFlags,
+        db_version,
 
         ### Cursor ###
         db_cursor,

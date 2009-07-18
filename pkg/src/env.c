@@ -8,6 +8,11 @@
 #include <Rinternals.h>
 #include <Rdefines.h>
 
+/* Berkeley DB: Database Environments and Related Methods */
+/* Copyright Oracle (tm) */
+/* R API Jeffrey A. Ryan 2009 */
+
+/*** Database Environment Operations ***/
 /* {{{ rberkeley_db_env_create */
 SEXP rberkeley_db_env_create (SEXP _flags)
 {
@@ -38,28 +43,49 @@ SEXP rberkeley_db_get_env (SEXP _dbp)
   return R_MakeExternalPtr(dbenv, R_NilValue, R_NilValue);
 }
 /* }}} */
-/* {{{ rberkeley_dbenv_open */
-SEXP rberkeley_dbenv_open (SEXP _dbenv, SEXP _db_home, SEXP _flags, SEXP _mode)
+/* {{{ rberkeley_dbenv_close */
+SEXP rberkeley_dbenv_close (SEXP _dbenv, SEXP _flags)
 {
   DB_ENV *dbenv;
   u_int32_t flags;
-  const char * dbhome;
-  int mode, ret;
+  int ret;
 
-  flags = (u_int32_t)INTEGER(_flags)[0];
+  flags = (u_int32_t)INTEGER(_flags)[0]; /* currently must be 0L */
 
   dbenv = R_ExternalPtrAddr(_dbenv);
-  ret = dbenv->open(dbenv, CHAR(STRING_ELT(_db_home,0)), flags, INTEGER(_mode)[0]);
-  if(ret != 0) {
-    ret = dbenv->close(dbenv, 0);
-    if(ret == 0)
-      R_ClearExternalPtr(_dbenv);
-  }
+  ret = dbenv->close(dbenv, flags);
+  if(ret == 0)
+    R_ClearExternalPtr(_dbenv);
 
   return ScalarInteger(ret);
-
 }
 /* }}} */
+/* {{{ rberkeley_dbenv_dbremove */
+SEXP rberkeley_dbenv_dbremove (SEXP _dbenv, SEXP _txnid, SEXP _file,
+                               SEXP _database, SEXP _flags)
+{
+  DB_ENV *dbenv;
+  DB_TXN *txnid;
+  u_int32_t flags;
+  int ret;
+  
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else txnid = NULL;
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbenv->dbremove(dbenv, txnid,
+                        CHAR(STRING_ELT(_file,0)), CHAR(STRING_ELT(_database,0)),
+                        flags);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
+/* rberkeley_dbenv_dbrename */
+/* rberkeley_dbenv_err */
+/* rberkeley_dbenv_errx */
+/* rberkeley_dbenv_failchk */
 /* {{{ rberkeley_dbenv_get_home */
 SEXP rberkeley_dbenv_get_home (SEXP _dbenv)
 {
@@ -90,23 +116,49 @@ SEXP rberkeley_dbenv_get_open_flags (SEXP _dbenv)
   return ScalarInteger(flags);
 }
 /* }}} */
-/* {{{ rberkeley_dbenv_close */
-SEXP rberkeley_dbenv_close (SEXP _dbenv, SEXP _flags)
+/* rberkeley_dbenv_lsn_reset */
+/* {{{ rberkeley_dbenv_open */
+SEXP rberkeley_dbenv_open (SEXP _dbenv, SEXP _db_home, SEXP _flags, SEXP _mode)
+{
+  DB_ENV *dbenv;
+  u_int32_t flags;
+  const char * dbhome;
+  int mode, ret;
+
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  ret = dbenv->open(dbenv, CHAR(STRING_ELT(_db_home,0)), flags, INTEGER(_mode)[0]);
+  if(ret != 0) {
+    ret = dbenv->close(dbenv, 0);
+    if(ret == 0)
+      R_ClearExternalPtr(_dbenv);
+  }
+
+  return ScalarInteger(ret);
+
+}
+/* }}} */
+/* rberkeley_dbenv_remove */
+/* {{{ rberkeley_dbenv_stat_print */
+SEXP rberkeley_dbenv_stat_print (SEXP _dbenv, SEXP _flags)
 {
   DB_ENV *dbenv;
   u_int32_t flags;
   int ret;
 
-  flags = (u_int32_t)INTEGER(_flags)[0]; /* currently must be 0L */
-
   dbenv = R_ExternalPtrAddr(_dbenv);
-  ret = dbenv->close(dbenv, flags);
-  if(ret == 0)
-    R_ClearExternalPtr(_dbenv);
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbenv->stat_print(dbenv, flags);
 
   return ScalarInteger(ret);
 }
 /* }}} */
+
+/*** Environment Configuration ***/
+/* rberkeley_dbenv_set_alloc */
+/* rberkeley_dbenv_set_app_dispatch */
 /* {{{ rberkeley_dbenv_set_cachesize */
 SEXP rberkeley_dbenv_set_cachesize (SEXP _dbenv, SEXP _gbytes,
                                     SEXP _bytes, SEXP _ncache)
@@ -175,21 +227,16 @@ SEXP rberkeley_dbenv_get_data_dirs (SEXP _dbenv)
   return mkString(*dirpp);  
 }
 /* }}} */
-/* {{{ rberkeley_dbenv_stat_print */
-SEXP rberkeley_dbenv_stat_print (SEXP _dbenv, SEXP _flags)
-{
-  DB_ENV *dbenv;
-  u_int32_t flags;
-  int ret;
-
-  dbenv = R_ExternalPtrAddr(_dbenv);
-  flags = (u_int32_t)INTEGER(_flags)[0];
-
-  ret = dbenv->stat_print(dbenv, flags);
-
-  return ScalarInteger(ret);
-}
-/* }}} */
+/* rberkeley_dbenv_set_encrypt */
+/* rberkeley_dbenv_set_errcall */
+/* rberkeley_dbenv_set_msgcall */
+/* rberkeley_dbenv_set_errfile */
+/* rberkeley_dbenv_set_msgfile */
+/* rberkeley_dbenv_set_encrypt */
+/* rberkeley_dbenv_get_encrypt_flags */
+/* rberkeley_dbenv_set_errpfx */
+/* rberkeley_dbenv_set_event_notify */
+/* rberkeley_dbenv_set_feedback */
 /* {{{ rberkeley_dbenv_set_flags */
 SEXP rberkeley_dbenv_set_flags (SEXP _dbenv, SEXP _flags, SEXP _onoff)
 {
@@ -222,6 +269,7 @@ SEXP rberkeley_dbenv_get_flags  (SEXP _dbenv)
   return ScalarInteger((int)flags);
 }
 /* }}} */
+/* rberkeley_dbenv_set_isalive */
 /* {{{ rberkeley_dbenv_set_intermediate_dir_mode */
 SEXP rberkeley_dbenv_set_intermediate_dir_mode (SEXP _dbenv, SEXP _mode)
 {
@@ -250,6 +298,7 @@ SEXP rberkeley_dbenv_get_intermediate_dir_mode (SEXP _dbenv)
   return mkString(modep);  
 }
 /* }}} */
+/* rberkeley_dbenv_set_rpc_server */
 /* {{{ rberkeley_dbenv_set_shm_key */
 SEXP rberkeley_dbenv_set_shm_key (SEXP _dbenv, SEXP _shm_key)
 {
@@ -280,6 +329,11 @@ SEXP rberkeley_dbenv_get_shm_key (SEXP _dbenv)
   return ScalarInteger((int)shm_key);  
 }
 /* }}} */
+/* rberkeley_dbenv_set_thread_id */
+/* rberkeley_dbenv_get_thread_id */
+/* rberkeley_dbenv_set_thread_id_string */
+/* rberkeley_dbenv_set_timeout */
+/* rberkeley_dbenv_get_timeout */
 /* {{{ rberkeley_dbenv_set_tmp_dir */
 SEXP rberkeley_dbenv_set_tmp_dir (SEXP _dbenv, SEXP _dir)
 {
@@ -306,5 +360,37 @@ SEXP rberkeley_dbenv_get_tmp_dir (SEXP _dbenv)
     return ScalarInteger(ret); 
 
   return mkString(dirp);  
+}
+/* }}} */
+/* {{{ rberkeley_dbenv_set_verbose */
+SEXP rberkeley_dbenv_set_verbose (SEXP _dbenv, SEXP _which, SEXP _onoff)
+{
+  DB_ENV *dbenv;
+  u_int32_t which;
+  int onoff, ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  which = (u_int32_t)INTEGER(_which)[0];
+  onoff = (int)INTEGER(_onoff)[0];
+
+  ret = dbenv->set_verbose(dbenv, which, onoff);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
+/* {{{ rberkeley_dbenv_get_verbose */
+SEXP rberkeley_dbenv_get_verbose (SEXP _dbenv, SEXP _which)
+{
+  DB_ENV *dbenv;
+  u_int32_t which;
+  int onoffp;
+  int ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  which = (u_int32_t)INTEGER(_which)[0];
+
+  ret = dbenv->get_verbose(dbenv, which, &onoffp);
+
+  return ScalarInteger(onoffp);
 }
 /* }}} */

@@ -116,3 +116,8 @@ db_rename <- function(dbh, file, database, newname)
 {
   .Call("rberkeley_db_rename", dbh, file, database, newname)
 }
+
+db_version <- function() 
+{
+  .Call("rberkeley_db_version")
+}

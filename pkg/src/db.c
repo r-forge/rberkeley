@@ -311,6 +311,7 @@ SEXP rberkeley_db_open (SEXP _dbp,
     DB_TXN *txnid;
 	int ret;
     u_int32_t flags = INTEGER(_flags)[0];
+    const char * file, database;
 
     dbp = R_ExternalPtrAddr(_dbp);
 
@@ -318,10 +319,14 @@ SEXP rberkeley_db_open (SEXP _dbp,
       txnid = R_ExternalPtrAddr(_txnid);
     } else txnid = NULL;
 
-    const char * file = CHAR(STRING_ELT(_file,0));
+    if(isNull(_file)) {
+      file = NULL;
+    } else {
+      file = CHAR(STRING_ELT(_file,0));
+    }
 
 	if ((ret = dbp->open(dbp,
-	    NULL, file, NULL, DB_BTREE, flags, 0664)) != 0) {
+	    txnid, file, NULL, DB_BTREE, flags, 0664)) != 0) {
 		dbp->err(dbp, ret, "%s", DATABASE);
 	}
     return ScalarInteger(ret);

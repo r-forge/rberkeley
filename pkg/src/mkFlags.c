@@ -22,6 +22,21 @@ SEXP mkFlags (SEXP _flags)
 
   for(i = 0; i < len_flags; i++) {
     cur_string = (char *)CHAR(STRING_ELT(_flags, i));
+    if(strcmp(cur_string,"DB_BTREE")==0) {
+      flags_bit = flags_bit | DB_BTREE; continue; 
+    } else
+    if(strcmp(cur_string,"DB_HASH")==0) {
+      flags_bit = flags_bit | DB_HASH; continue; 
+    } else
+    if(strcmp(cur_string,"DB_QUEUE")==0) {
+      flags_bit = flags_bit | DB_QUEUE; continue; 
+    } else
+    if(strcmp(cur_string,"DB_RECNO")==0) {
+      flags_bit = flags_bit | DB_RECNO; continue; 
+    } else
+    if(strcmp(cur_string,"DB_UNKNOWN")==0) {
+      flags_bit = flags_bit | DB_UNKNOWN; continue; 
+    } else
     if(strcmp(cur_string,"DB_AGGRESSIVE")==0) {
       flags_bit = flags_bit | DB_AGGRESSIVE; continue; 
     } else
