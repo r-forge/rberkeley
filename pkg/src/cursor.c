@@ -8,6 +8,8 @@
 #include <Rinternals.h>
 #include <Rdefines.h>
 
+/* Berkeley DB: Database Cursors and Related Methods */
+
 /* {{{ rberkeley_db_cursor */
 SEXP rberkeley_db_cursor (SEXP _dbp, SEXP _txnid, SEXP _flags)
 {

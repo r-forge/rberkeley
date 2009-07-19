@@ -2,13 +2,12 @@ db_create <- function(dbenv=NULL, flags=0L) {
   .Call("rberkeley_db_create", dbenv, flags)
 }
 
-db_open <- function(dbh, file="access.db", flags=0L) {
-  if(check_pointer(dbh))
-    .Call("rberkeley_db_open", dbh, NULL, file, flags)
+db_open <- function(dbh, txnid=NULL, file="access.db",
+                    database=NULL, flags=0L) {
+  .Call("rberkeley_db_open", dbh, txnid, file, database, flags)
 }
 
 db_close <- function(dbh) {
-  if(check_pointer(dbh))
   .Call("rberkeley_db_close", dbh)
 }
 
@@ -19,7 +18,6 @@ db_put <- function(dbh, key, data)
   if(!is.raw(data))
     data <- serialize(data, NULL)
 
-  if(check_pointer(dbh))
   .Call("rberkeley_db_put", dbh, key, data)
 }
 
@@ -28,7 +26,6 @@ db_get <- function(dbh, key)
   if(!is.raw(key))
     key <- serialize(key, NULL)
 
-  if(check_pointer(dbh))
   .Call("rberkeley_db_get", dbh, key)
 }
 
@@ -45,8 +42,7 @@ db_truncate <- function(dhh)
 }
 db_get_byteswapped <- function(dbh)
 {
-  if(check_pointer(dbh))
-    .Call("rberkeley_db_get_byteswapped", dbh)
+  .Call("rberkeley_db_get_byteswapped", dbh)
 }
 
 db_set_cachesize <- function(dbh, gbytes, bytes, ncache)

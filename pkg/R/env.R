@@ -90,7 +90,7 @@ dbenv_get_open_flags <- function(dbenv)
   .Call("rberkeley_dbenv_get_open_flags", dbenv)
 }
 
-dbenv_close <- function(dbenv, flags)
+dbenv_close <- function(dbenv, flags=0L)
 {
   if(check_pointer(dbenv))
     .Call("rberkeley_dbenv_close", dbenv, flags)
