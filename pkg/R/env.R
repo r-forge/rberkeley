@@ -7,6 +7,22 @@ db_get_env <- function(dbh)
   .Call("rberkeley_db_get_env", dbh)
 }
 
+dbenv_remove <- function(dbenv, db_home, flags=0L)
+{
+  .Call("rberkeley_dbenv_remove", dbenv, db_home, as.integer(flags))
+}
+
+dbenv_dbremove <- function(dbenv, txnid=NULL, file, database, flags)
+{
+  .Call("rberkeley_dbenv_dbremove", dbh, txnid, file, database, as.integer(flags))
+}
+
+dbenv_dbrename <- function(dbenv, txnid=NULL, file, database, newname, flags)
+{
+  .Call("rberkeley_dbenv_dbrename", dbh, txnid, file, database, 
+        newname, as.integer(flags))
+}
+
 dbenv_set_cachesize <- function(dbenv, gbytes, bytes, ncache)
 {
   .Call("rberkeley_dbenv_set_cachesize", 
@@ -100,4 +116,16 @@ dbenv_stat_print <- function(dbenv, flags)
 {
   if(check_pointer(dbenv))
     .Call("rberkeley_dbenv_stat_print", dbenv, flags)
+}
+
+dbenv_set_verbose <- function(dbenv, which, onoff=1L)
+{
+  .Call("rberkeley_dbenv_set_verbose", dbenv, as.integer(which), as.integer(onoff))
+}
+
+dbenv_get_verbose <- function(dbenv, which)
+{
+  if(missing(which))
+    stop("'which' must be a valid flag set with mkFlags")
+  .Call("rberkeley_dbenv_set_verbose", dbenv, as.integer(which))
 }

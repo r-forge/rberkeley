@@ -27,7 +27,7 @@ SEXP rberkeley_db_env_create (SEXP _flags)
   if(ret != 0)
     return ScalarInteger(ret);
 
-  return R_MakeExternalPtr(dbenvp, R_NilValue, R_NilValue);
+  return R_MakeExternalPtr(dbenvp, install("DB_ENV"), R_NilValue);
 }
 /* }}} */
 /* {{{ rberkeley_db_get_env */
@@ -38,6 +38,8 @@ SEXP rberkeley_db_get_env (SEXP _dbp)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
 
   dbenv = dbp->get_env(dbp);
   return R_MakeExternalPtr(dbenv, R_NilValue, R_NilValue);
@@ -53,6 +55,8 @@ SEXP rberkeley_dbenv_close (SEXP _dbenv, SEXP _flags)
   flags = (u_int32_t)INTEGER(_flags)[0]; /* currently must be 0L */
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->close(dbenv, flags);
   if(ret == 0)
     R_ClearExternalPtr(_dbenv);
@@ -70,6 +74,8 @@ SEXP rberkeley_dbenv_dbremove (SEXP _dbenv, SEXP _txnid, SEXP _file,
   int ret;
   
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   if(!isNull(_txnid)) {
     txnid = R_ExternalPtrAddr(_txnid);
   } else txnid = NULL;
@@ -82,7 +88,30 @@ SEXP rberkeley_dbenv_dbremove (SEXP _dbenv, SEXP _txnid, SEXP _file,
   return ScalarInteger(ret);
 }
 /* }}} */
-/* rberkeley_dbenv_dbrename */
+/* {{{ rberkeley_dbenv_dbrename */
+SEXP rberkeley_dbenv_dbrename (SEXP _dbenv, SEXP _txnid, SEXP _file,
+                               SEXP _database, SEXP _newname, SEXP _flags)
+{
+  DB_ENV *dbenv;
+  DB_TXN *txnid;
+  u_int32_t flags;
+  int ret;
+  
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else txnid = NULL;
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbenv->dbrename(dbenv, txnid,
+                        CHAR(STRING_ELT(_file,0)), CHAR(STRING_ELT(_database,0)),
+                        CHAR(STRING_ELT(_newname,0)), flags);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* rberkeley_dbenv_err */
 /* rberkeley_dbenv_errx */
 /* rberkeley_dbenv_failchk */
@@ -94,6 +123,8 @@ SEXP rberkeley_dbenv_get_home (SEXP _dbenv)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->get_home(dbenv, &homep);
 
   if(ret != 0)
@@ -109,6 +140,8 @@ SEXP rberkeley_dbenv_get_open_flags (SEXP _dbenv)
   int ret;
   
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->get_open_flags(dbenv, &flags);
 
   if(ret != 0)
@@ -128,6 +161,8 @@ SEXP rberkeley_dbenv_open (SEXP _dbenv, SEXP _db_home, SEXP _flags, SEXP _mode)
   flags = (u_int32_t)INTEGER(_flags)[0];
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->open(dbenv, CHAR(STRING_ELT(_db_home,0)), flags, INTEGER(_mode)[0]);
   if(ret != 0) {
     ret = dbenv->close(dbenv, 0);
@@ -139,7 +174,24 @@ SEXP rberkeley_dbenv_open (SEXP _dbenv, SEXP _db_home, SEXP _flags, SEXP _mode)
 
 }
 /* }}} */
-/* rberkeley_dbenv_remove */
+/* {{{ rberkeley_dbenv_remove */
+SEXP rberkeley_dbenv_remove (SEXP _dbenv, SEXP _db_home, SEXP _flags)
+{
+  DB_ENV *dbenv;
+  u_int32_t flags;
+  int ret;
+
+  dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbenv->remove(dbenv, CHAR(STRING_ELT(_db_home,0)), flags);
+  warning("'dbenv' handle is no longer valid");
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* {{{ rberkeley_dbenv_stat_print */
 SEXP rberkeley_dbenv_stat_print (SEXP _dbenv, SEXP _flags)
 {
@@ -148,6 +200,8 @@ SEXP rberkeley_dbenv_stat_print (SEXP _dbenv, SEXP _flags)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   flags = (u_int32_t)INTEGER(_flags)[0];
 
   ret = dbenv->stat_print(dbenv, flags);
@@ -172,6 +226,8 @@ SEXP rberkeley_dbenv_set_cachesize (SEXP _dbenv, SEXP _gbytes,
   ncache = (int)INTEGER(_ncache)[0];
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->set_cachesize(dbenv, gbytes, bytes, ncache);
 
   return ScalarInteger(ret);
@@ -185,6 +241,8 @@ SEXP rberkeley_dbenv_get_cachesize (SEXP _dbenv)
   u_int32_t gbytesp, bytesp;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->get_cachesize(dbenv, &gbytesp, &bytesp, &ncachep);
 
   if(ret != 0)
@@ -206,6 +264,8 @@ SEXP rberkeley_dbenv_set_data_dir (SEXP _dbenv, SEXP _dir)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->set_data_dir(dbenv, CHAR(STRING_ELT(_dir, 0)));
 
   return ScalarInteger(ret); 
@@ -219,6 +279,8 @@ SEXP rberkeley_dbenv_get_data_dirs (SEXP _dbenv)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->get_data_dirs(dbenv, &dirpp);
 
   if(ret != 0) 
@@ -245,6 +307,8 @@ SEXP rberkeley_dbenv_set_flags (SEXP _dbenv, SEXP _flags, SEXP _onoff)
   int onoff, ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   flags = (u_int32_t)INTEGER(_flags)[0];
   onoff = INTEGER(_onoff)[0];
 
@@ -261,6 +325,8 @@ SEXP rberkeley_dbenv_get_flags  (SEXP _dbenv)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->get_flags(dbenv, &flags);
 
   if(ret != 0)
@@ -277,6 +343,8 @@ SEXP rberkeley_dbenv_set_intermediate_dir_mode (SEXP _dbenv, SEXP _mode)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->set_intermediate_dir_mode (dbenv, CHAR(STRING_ELT(_mode, 0)));
 
   return ScalarInteger(ret); 
@@ -290,6 +358,8 @@ SEXP rberkeley_dbenv_get_intermediate_dir_mode (SEXP _dbenv)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->get_intermediate_dir_mode(dbenv, &modep);
 
   if(ret != 0) 
@@ -307,6 +377,8 @@ SEXP rberkeley_dbenv_set_shm_key (SEXP _dbenv, SEXP _shm_key)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   shm_key = (long)INTEGER(_shm_key); /* would be better if we had longs in R ... atol? */
   
   ret = dbenv->set_shm_key(dbenv, shm_key);
@@ -321,6 +393,8 @@ SEXP rberkeley_dbenv_get_shm_key (SEXP _dbenv)
   int ret;
   
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->get_shm_key(dbenv, &shm_key);
 
   if(ret != 0)
@@ -341,6 +415,8 @@ SEXP rberkeley_dbenv_set_tmp_dir (SEXP _dbenv, SEXP _dir)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->set_tmp_dir(dbenv, CHAR(STRING_ELT(_dir, 0)));
 
   return ScalarInteger(ret); 
@@ -354,6 +430,8 @@ SEXP rberkeley_dbenv_get_tmp_dir (SEXP _dbenv)
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   ret = dbenv->get_tmp_dir(dbenv, &dirp);
 
   if(ret != 0) 
@@ -370,6 +448,8 @@ SEXP rberkeley_dbenv_set_verbose (SEXP _dbenv, SEXP _which, SEXP _onoff)
   int onoff, ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   which = (u_int32_t)INTEGER(_which)[0];
   onoff = (int)INTEGER(_onoff)[0];
 
@@ -381,12 +461,15 @@ SEXP rberkeley_dbenv_set_verbose (SEXP _dbenv, SEXP _which, SEXP _onoff)
 /* {{{ rberkeley_dbenv_get_verbose */
 SEXP rberkeley_dbenv_get_verbose (SEXP _dbenv, SEXP _which)
 {
+  warning("unable to get_verbose"); return R_NilValue;
   DB_ENV *dbenv;
   u_int32_t which;
   int onoffp;
   int ret;
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
   which = (u_int32_t)INTEGER(_which)[0];
 
   ret = dbenv->get_verbose(dbenv, which, &onoffp);
