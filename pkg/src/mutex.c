@@ -68,13 +68,16 @@ SEXP rberkeley_dbenv_mutex_stat_print (SEXP _dbenv, SEXP _flags)
   DB_ENV *dbenv;
   u_int32_t flags;
   int ret;
-  
+
   flags = (u_int32_t)INTEGER(_flags)[0];
 
   dbenv = R_ExternalPtrAddr(_dbenv);
+  if(R_ExternalPtrTag(_dbenv) != install("DB_ENV") || dbenv == NULL)
+    error("invalid 'dbenv' handle");
+ 
   ret = dbenv->mutex_stat_print(dbenv, flags);
 
-  return ScalarInteger(ret);
+  return ScalarInteger(ret); 
 }
 /* }}} */
 /* {{{ rberkeley_dbenv_mutex_unlock */
@@ -96,9 +99,15 @@ SEXP rberkeley_dbenv_mutex_unlock (SEXP _dbenv, SEXP _mutex)
 /* Mutex Configuration */
 /* {{{ rberkeley_dbenv_mutex_set_align */
 /* }}} */
+/* {{{ rberkeley_dbenv_mutex_get_align */
+/* }}} */
 /* {{{ rberkeley_dbenv_mutex_set_increment */
 /* }}} */
+/* {{{ rberkeley_dbenv_mutex_get_increment */
+/* }}} */
 /* {{{ rberkeley_dbenv_mutex_set_max */
+/* }}} */
+/* {{{ rberkeley_dbenv_mutex_get_max */
 /* }}} */
 /* {{{ rberkeley_dbenv_mutex_tas_spins */
 /* }}} */

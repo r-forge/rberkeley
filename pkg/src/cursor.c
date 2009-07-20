@@ -13,24 +13,26 @@
 /* {{{ rberkeley_db_cursor */
 SEXP rberkeley_db_cursor (SEXP _dbp, SEXP _txnid, SEXP _flags)
 {
-	DB *dbp;
-    DBC *dbc;
-    DB_TXN *txnid;
-	int ret;
-    u_int32_t flags = INTEGER(_flags)[0];
+  DB *dbp;
+  DBC *dbc;
+  DB_TXN *txnid;
+  int ret;
+  u_int32_t flags = INTEGER(_flags)[0];
 
-    dbp = R_ExternalPtrAddr(_dbp);
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
 
-    if(!isNull(_txnid)) {
-      txnid = R_ExternalPtrAddr(_txnid);
-    } else txnid = NULL;
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else txnid = NULL;
 
-    ret = dbp->cursor(dbp, txnid, &dbc, flags);
+  ret = dbp->cursor(dbp, txnid, &dbc, flags);
 
-    if(ret != 0)
-      return ScalarInteger(ret);
+  if(ret != 0)
+    return ScalarInteger(ret);
 
-    return R_MakeExternalPtr(dbc, R_NilValue, R_NilValue);
+  return R_MakeExternalPtr(dbc, install("DBC"), R_NilValue);
 }
 /* }}} */
 /* {{{ rberkeley_dbcursor_close */
@@ -40,6 +42,8 @@ SEXP rberkeley_dbcursor_close (SEXP _dbc)
   int ret;
 
   dbc = R_ExternalPtrAddr(_dbc);
+  if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
+    error("invalid 'dbc' handle");
 
   ret = dbc->close(dbc);
   if(ret == 0) {
@@ -60,6 +64,8 @@ SEXP rberkeley_dbcursor_count (SEXP _dbc, SEXP _flags)
   flags = (u_int32_t)INTEGER(_flags)[0]; /* unused by API, set to 0L */
 
   dbc = R_ExternalPtrAddr(_dbc);
+  if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
+    error("invalid 'dbc' handle");
 
   ret = dbc->count(dbc, &countp, flags);
 
@@ -77,6 +83,8 @@ SEXP rberkeley_dbcursor_del (SEXP _dbc, SEXP _flags)
   int ret;
   
   dbc = R_ExternalPtrAddr(_dbc);
+  if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
+    error("invalid 'dbc' handle");
   flags = (u_int32_t)INTEGER(_flags)[0];
   
   ret = dbc->del(dbc, flags);
@@ -92,6 +100,8 @@ SEXP rberkeley_dbcursor_dup (SEXP _dbc, SEXP _flags)
   int ret;
 
   dbc = R_ExternalPtrAddr(_dbc);
+  if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
+    error("invalid 'dbc' handle");
   flags = (u_int32_t)INTEGER(_flags)[0];
 
   ret = dbc->dup(dbc, &dbc2, flags);
@@ -99,7 +109,7 @@ SEXP rberkeley_dbcursor_dup (SEXP _dbc, SEXP _flags)
   if(ret != 0)
     return ScalarInteger(ret);
 
-  return R_MakeExternalPtr(dbc2, R_NilValue, R_NilValue);
+  return R_MakeExternalPtr(dbc2, install("DBC"), R_NilValue);
 }
 /* }}} */
 /* {{{ rberkeley_dbcursor_get */
@@ -118,6 +128,8 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
   n = (INTEGER(_n)[0] < 0) ? 100 : INTEGER(_n)[0]; /* this should be _all_ data */
 
   dbc = R_ExternalPtrAddr(_dbc);
+  if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
+    error("invalid 'dbc' handle");
 
   memset(&key, 0, sizeof(DBT));
   memset(&data, 0, sizeof(DBT));
@@ -196,6 +208,8 @@ SEXP rberkeley_dbcursor_put (SEXP _dbc, SEXP _key, SEXP _data, SEXP _flags)
     error("incorrect flags value");
   } 
   dbc = R_ExternalPtrAddr(_dbc);
+  if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
+    error("invalid 'dbc' handle");
 
   memset(&key, 0, sizeof(DBT));
   memset(&data, 0, sizeof(DBT));
@@ -219,6 +233,8 @@ SEXP rberkeley_dbcursor_set_priority (SEXP _dbc, SEXP _priority)
   int ret;
 
   dbc = R_ExternalPtrAddr(_dbc);
+  if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
+    error("invalid 'dbc' handle");
   priority = (DB_CACHE_PRIORITY)INTEGER(_priority)[0];
 
   ret = dbc->set_priority(dbc, priority);
@@ -234,6 +250,8 @@ SEXP rberkeley_dbcursor_get_priority (SEXP _dbc)
   int ret;
 
   dbc = R_ExternalPtrAddr(_dbc);
+  if(R_ExternalPtrTag(_dbc) != install("DBC") || dbc == NULL)
+    error("invalid 'dbc' handle");
 
   ret = dbc->get_priority(dbc, &priority);
 
