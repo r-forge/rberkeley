@@ -553,7 +553,8 @@ SEXP rberkeley_db_set_priority (SEXP _dbp, SEXP _priority)
     error("invalid 'db' handle");
   priority = (DB_CACHE_PRIORITY)INTEGER(_priority)[0];
 
-  ret = dbp->set_priority(dbp, priority);
+  //ret = dbp->set_priority(dbp, priority);
+  ret = dbp->set_priority(dbp, DB_PRIORITY_LOW);
 
   return ScalarInteger(ret);
 }
@@ -561,7 +562,7 @@ SEXP rberkeley_db_set_priority (SEXP _dbp, SEXP _priority)
 /* {{{ rberkeley_db_get_priority */
 SEXP rberkeley_db_get_priority (SEXP _dbp)
 {
-error("currently unavailable in R");
+  error("DB->get_priority is unavailable from R");
   DBC *dbp;
   DB_CACHE_PRIORITY priority;
   int ret;
@@ -570,9 +571,8 @@ error("currently unavailable in R");
   if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
-Rprintf("before\n");
+  /* something is wrong with this call... */
   ret = dbp->get_priority(dbp, &priority);
-Rprintf("after\n");
 
   if(ret != 0) 
     return ScalarInteger(ret);

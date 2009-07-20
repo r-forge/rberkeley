@@ -127,5 +127,5 @@ dbenv_get_verbose <- function(dbenv, which)
 {
   if(missing(which))
     stop("'which' must be a valid flag set with mkFlags")
-  .Call("rberkeley_dbenv_set_verbose", dbenv, as.integer(which))
+  .Call("rberkeley_dbenv_get_verbose", dbenv, as.integer(which))
 }
