@@ -2,6 +2,11 @@ db_create <- function(dbenv=NULL, flags=0L) {
   .Call("rberkeley_db_create", dbenv, flags)
 }
 
+db_strerror <- function(error)
+{
+  .Call("rberkeley_db_strerror", as.integer(error))
+} 
+
 db_open <- function(dbh, txnid=NULL, file="access.db",
                     database=NULL, flags=0L) {
   .Call("rberkeley_db_open", dbh, txnid, file, database, flags)
@@ -9,6 +14,39 @@ db_open <- function(dbh, txnid=NULL, file="access.db",
 
 db_close <- function(dbh) {
   .Call("rberkeley_db_close", dbh)
+}
+
+db_upgrade <- function(dbh, file, flags)
+{
+  .Call("rberkeley_db_upgrade", dbh, file, as.integer(flags))
+}
+
+db_compact <- function(dbh, txnid=NULL, start=NULL, stop=NULL,
+                       c_data=NULL, flags=0L)
+{
+  .Call("rberkeley_db_compact", dbh, txnid, start, stop, c_data, as.integer(flags))
+}
+
+db_set_priority <- function(dbh, priority)
+{
+  if(is.character(priority))
+    priority <- mkFlags(priority)
+  .Call("rberkeley_db_set_priority", dbh, as.integer(priority))
+}
+
+db_get_priority <- function(dbh)
+{
+  .Call("rberkeley_db_get_priority", dbh)
+}
+
+db_set_flags <- function(dbh, flags=0L)
+{
+  .Call("rberkeley_db_set_flags", dbh, as.integer(flags))
+}
+
+db_get_flags <- function(dbh)
+{
+  .Call("rberkeley_db_get_flags", dbh)
 }
 
 db_put <- function(dbh, key, data)
@@ -27,6 +65,13 @@ db_get <- function(dbh, key)
     key <- serialize(key, NULL)
 
   .Call("rberkeley_db_get", dbh, key)
+}
+
+db_key_range <- function(dbh, txnid=NULL, key, flags=0L)
+{
+  if(!is.raw(key))
+    key <- serialize(key, NULL)
+  .Call("rberkeley_db_key_range", dbh, txnid, key, as.integer(flags))
 }
 
 db_exists <- function(dbh, txnid=NULL, key, flags=0L)
@@ -78,6 +123,11 @@ db_set_encrypt <- function(dbh, passwd, flags)
     flags = mkFlags(DB_ENCRYPT_AES)
   
   .Call("rberkeley_db_set_encrypt", dbh, passwd, flags)
+}
+
+db_get_encrypt_flags <- function(dbh)
+{
+  .Call("rberkeley_db_get_encrypt_flags", dbh)
 }
  
 db_set_lorder <- function(dbh, lorder)

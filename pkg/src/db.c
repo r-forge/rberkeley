@@ -37,6 +37,12 @@ SEXP rberkeley_db_version ()
   return Version;
 }
 /* }}} */
+/* {{{ rberkeley_db_strerror */
+SEXP rberkeley_db_strerror (SEXP _error)
+{
+  return mkString(db_strerror(INTEGER(_error)[0]));
+}
+/* }}} */
 /* {{{ rberkeley_db_create */
 SEXP rberkeley_db_create (SEXP _dbenv)
 {
@@ -68,13 +74,50 @@ SEXP rberkeley_db_close(SEXP _dbp)
   if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->close(dbp, 0);
-  if(ret == 0)
-    R_ClearExternalPtr(_dbp);
+  warning("'db' handle may not be accessed again");
+  R_ClearExternalPtr(_dbp);
 
   return(ScalarInteger(ret));
 }
 /* }}} */
-/* rberkeley_db_compact */
+/* {{{ rberkeley_db_compact */
+SEXP rberkeley_db_compact (SEXP _dbp, SEXP _txnid, SEXP _start,
+                           SEXP _stop, SEXP _c_data, SEXP _flags)
+{
+  DB *dbp;
+  DB_TXN *txnid;
+  DBT start, stop, end;
+  DB_COMPACT c_data;
+  u_int32_t flags;
+  int ret;
+
+  if(isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else {
+    txnid = NULL;
+  }
+  if(!isNull(_start)) {
+    memset(&start, 0, sizeof(DBT));
+    start.data = (unsigned char *)RAW(_start);
+    start.size = length(_start);
+  }
+  if(!isNull(_stop)) {
+    memset(&stop, 0, sizeof(DBT));
+    stop.data = (unsigned char *)RAW(_stop);
+    stop.size = length(_stop);
+  }
+  flags = (u_int32_t)INTEGER(_flags)[0];
+  /*memset(&end, 0, sizeof(end));*/
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+
+  ret = dbp->compact(dbp, txnid, &start, &stop, NULL, flags, &end); 
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* {{{ rberkeley_db_del */
 SEXP rberkeley_db_del(SEXP _dbp, SEXP _key)
 {
@@ -316,7 +359,49 @@ SEXP rberkeley_db_get_type (SEXP _dbp)
 }
 /* }}} */
 /* rberkeley_db_join */
-/* rberkeley_db_key_range */
+/* {{{ rberkeley_db_key_range */
+SEXP rberkeley_db_key_range (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
+{
+  DB *dbp;
+  DB_TXN *txnid;
+  DBT key;
+  DB_KEY_RANGE key_range;
+  u_int32_t flags = (u_int32_t)INTEGER(_flags)[0];
+  int ret;
+
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else txnid = NULL;
+  
+  memset(&key, 0, sizeof(DBT));
+  if(isNull(_key))
+    error("key must be set");
+  key.data = (unsigned char *)RAW(_key);
+  key.size = length(_key);
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+ 
+  ret = dbp->key_range(dbp, txnid, &key, &key_range, flags); 
+  if(ret != 0)
+    return ScalarInteger(ret);
+   
+  SEXP KeyRange, names;
+  PROTECT(KeyRange = allocVector(VECSXP, 3));
+  SET_VECTOR_ELT(KeyRange, 0, ScalarReal(key_range.less));
+  SET_VECTOR_ELT(KeyRange, 1, ScalarReal(key_range.equal));
+  SET_VECTOR_ELT(KeyRange, 2, ScalarReal(key_range.greater));
+  PROTECT(names = allocVector(STRSXP, 3));
+  SET_STRING_ELT(names, 0, mkChar("less")); 
+  SET_STRING_ELT(names, 1, mkChar("equal")); 
+  SET_STRING_ELT(names, 2, mkChar("greater")); 
+  
+  setAttrib(KeyRange, R_NamesSymbol, names);
+  UNPROTECT(2);
+  return KeyRange;
+}
+/* }}} */
 /* {{{ rberkeley_db_open */
 SEXP rberkeley_db_open (SEXP _dbp, 
                         SEXP _txnid, 
@@ -328,13 +413,13 @@ SEXP rberkeley_db_open (SEXP _dbp,
                         SEXP _flags/*,
                         SEXP _mode*/)
 {
-	DB *dbp;
-    DB_TXN *txnid;
-	int ret;
-    u_int32_t flags = INTEGER(_flags)[0];
-    const char * file, * database;
+  DB *dbp;
+  DB_TXN *txnid;
+  int ret;
+  u_int32_t flags = INTEGER(_flags)[0];
+  const char * file, * database;
 
-    dbp = R_ExternalPtrAddr(_dbp);
+  dbp = R_ExternalPtrAddr(_dbp);
   if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
     error("invalid 'db' handle");
 
@@ -417,13 +502,19 @@ SEXP rberkeley_db_remove (SEXP _dbp, SEXP _file, SEXP _database)
   DB *dbp;
   int ret;
   u_int32_t flags = 0;
+  const char * database; 
+  if(isNull(_database)) {
+    database = NULL;
+  } else {
+    database = (const char *)CHAR(STRING_ELT(_database,0));
+  }
 
   dbp = R_ExternalPtrAddr(_dbp);
   if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->remove(dbp,
                     (const char *)CHAR(STRING_ELT(_file,0)),
-                    (const char *)CHAR(STRING_ELT(_database,0)),
+                    database,
                     flags);
 
   return ScalarInteger(ret);
@@ -449,7 +540,63 @@ SEXP rberkeley_db_rename (SEXP _dbp, SEXP _file, SEXP _database,
   return ScalarInteger(ret);
 }
 /* }}} */
-/* rberkeley_db_set_priority */
+/* {{{ rberkeley_db_set_priority */
+SEXP rberkeley_db_set_priority (SEXP _dbp, SEXP _priority)
+{
+  DB *dbp;
+  DB_CACHE_PRIORITY priority;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+  priority = (DB_CACHE_PRIORITY)INTEGER(_priority)[0];
+
+  ret = dbp->set_priority(dbp, priority);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
+/* {{{ rberkeley_db_get_priority */
+SEXP rberkeley_db_get_priority (SEXP _dbp)
+{
+error("currently unavailable in R");
+  DBC *dbp;
+  DB_CACHE_PRIORITY priority;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+
+Rprintf("before\n");
+  ret = dbp->get_priority(dbp, &priority);
+Rprintf("after\n");
+
+  if(ret != 0) 
+    return ScalarInteger(ret);
+
+  switch(priority) {
+    case DB_PRIORITY_VERY_LOW:
+      return mkString("DB_PRIORITY_VERY_LOW");
+      break;
+    case DB_PRIORITY_LOW:
+      return mkString("DB_PRIORITY_LOW");
+      break;
+    case DB_PRIORITY_DEFAULT:
+      return mkString("DB_PRIORITY_DEFAULT");
+      break;
+    case DB_PRIORITY_HIGH:
+      return mkString("DB_PRIORITY_HIGH");
+      break;
+    case DB_PRIORITY_VERY_HIGH:
+      return mkString("DB_PRIORITY_VERY_HIGH");
+      break;
+    default:
+      return R_NilValue;
+  }
+}
+/* }}} */
 /* rberkeley_db_stat */
 /* {{{ rberkeley_db_stat_print */
 SEXP rberkeley_db_stat_print (SEXP _dbp, SEXP _flags)
@@ -503,7 +650,23 @@ SEXP rberkeley_db_truncate (SEXP _dbp, SEXP _txnid)
   return ScalarInteger(countp); 
 }
 /* }}} */
-/* rberkeley_db_upgrade */
+/* {{{ rberkeley_db_upgrade */
+SEXP  rberkeley_db_upgrade (SEXP _dbp, SEXP _file, SEXP _flags)
+{
+  DB *dbp;
+  u_int32_t flags;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbp->upgrade(dbp, (const char *)CHAR(STRING_ELT(_file,0)), flags);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* rberkeley_db_verify */
 
 /*** Database Configuration ***/
@@ -567,20 +730,90 @@ SEXP rberkeley_db_set_encrypt (SEXP _dbp, SEXP _passwd, SEXP _flags)
     error("invalid 'db' handle");
 
   passwd = CHAR(STRING_ELT(_passwd, 0));
-  flags  = INTEGER(_flags)[0];
+  flags  = (u_int32_t)INTEGER(_flags)[0];
 
   ret = dbp->set_encrypt(dbp, passwd, flags);
 
   return ScalarInteger(ret);
 }
 /* }}} */
+/* {{{ rberkeley_db_get_encrypt_flags */
+SEXP rberkeley_db_get_encrypt_flags (SEXP _dbp)
+{
+  DB *dbp;
+  int ret;
+  u_int32_t flagsp;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+
+  ret = dbp->get_encrypt_flags(dbp, &flagsp);
+
+  if(ret != 0)
+    return ScalarInteger(ret);
+
+  return ScalarInteger((int)flagsp);
+}
+/* }}} */
 /* rberkeley_db_set_errcall */
 /* rberkeley_db_set_msgcall  */
 /* rberkeley_db_set_errfile */
-/* rberkeley_db_set_msgfile */
+/* {{{ rberkeley_db_set_msgfile */
+SEXP rberkeley_db_set_msgfile (SEXP _dbp, SEXP _msgfile)
+{
+  DB *dbp;
+  FILE * msgfile = NULL;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+  
+  msgfile = (FILE *)R_ExternalPtrAddr(_msgfile);
+
+  dbp->set_msgfile(dbp, msgfile);
+  return R_NilValue;
+}
+/* }}} */
 /* rberkeley_db_set_errpfx */
 /* rberkeley_db_set_feedback */
-/* rberkeley_db_set_flags */
+/* {{{ rberkeley_db_set_flags */
+SEXP rberkeley_db_set_flags (SEXP _dbp, SEXP _flags)
+{
+  DB *dbp;
+  u_int32_t flags;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbp->set_flags(dbp, flags);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
+/* {{{ rberkeley_db_get_flags */
+SEXP rberkeley_db_get_flags (SEXP _dbp)
+{
+  DB *dbp;
+  u_int32_t flags;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+    error("invalid 'db' handle");
+
+  ret = dbp->get_flags(dbp, &flags);
+
+  if(ret != 0)
+    return ScalarInteger(ret);
+
+  return ScalarInteger((int)flags);
+}
+/* }}} */
 /* {{{ rberkeley_db_set_lorder */
 SEXP rberkeley_db_set_lorder (SEXP _dbp, SEXP _lorder)
 {
