@@ -1,6 +1,6 @@
 \name{BerkeleyDB Environments}
 \Rdversion{1.1}
-\alias{DB-Environments}
+\alias{Environments}
 \alias{db_env_create}
 \alias{db_get_env}
 \alias{dbenv_close}

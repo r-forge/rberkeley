@@ -15,3 +15,16 @@ SEXP rberkeley_check_pointer (SEXP _dbh)
     return ScalarInteger(0);
   } else return ScalarInteger(1);
 }
+
+SEXP rberkeley_fclose (SEXP _file_ptr)
+{
+  FILE *f;
+
+  f = R_ExternalPtrAddr(_file_ptr);
+  if(f != NULL) {
+    fclose(f);
+    R_ClearExternalPtr(_file_ptr);
+Rprintf("file close; external pointer cleared\n");
+  }
+  return R_NilValue;
+}

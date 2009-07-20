@@ -25,6 +25,9 @@ export(
         db_remove,
         db_rename,
         db_upgrade,
+        db_get_dbname,
+        db_get_type,
+        db_sync,
 
         db_exists,
         db_put,
@@ -39,6 +42,10 @@ export(
         db_get_priority,
         db_set_flags,
         db_get_flags,
+        db_set_errpfx,
+        db_get_errpfx,
+        db_set_errfile,
+        db_set_msgfile,
 
         db_get_byteswapped,
         db_stat_print,
@@ -88,3 +95,4 @@ export(
         dbenv_memp_stat_print
       )
 
+S3method(print, DB)

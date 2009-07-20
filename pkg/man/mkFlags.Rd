@@ -15,7 +15,7 @@ mkFlags(...)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{\dots}{
-  unquoted names of DB constants
+  quoted or unquoted comma separated names of DB constants
 }
 }
 \details{
@@ -35,9 +35,9 @@ If a name is passed that is not part of the
 available API, a warning is returned and
 the argument is effectively ignored.  If this
 value \emph{should} be present, and simply isn't
-please submit a bug report to the maintainer.
+please submit a bug report to the RBerkeley maintainer.
 
-All operations are within the C code to
+All bitwise operations are within the C code to
 allow for maximum consistency with the API,
 as well as allowing as close to the API
 semantics as possible.
@@ -61,7 +61,7 @@ mkFlags(DB_RDONLY)
 
 # DB_NOTHERE is not valid, throws warning
 \dontrun{
-mkFlags(DB_NOMMAP,DB_NOTHERE)
+mkFlags(DB_NOMMAP,DB_CONSTANT_NOT_DEFINED)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

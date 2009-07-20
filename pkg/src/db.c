@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "db.h"
+#include "RBerkeley.h"
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
@@ -59,7 +60,7 @@ SEXP rberkeley_db_create (SEXP _dbenv)
     ret = db_create(&dbp, dbenv, 0);
   }
   if(ret==0)
-    return R_MakeExternalPtr(dbp, install("DB"), R_NilValue);
+    return R_MakeExternalPtr(dbp, RBerkeley_DB, R_NilValue);
   return ScalarInteger(ret);
 }
 /* }}} */
@@ -71,7 +72,7 @@ SEXP rberkeley_db_close(SEXP _dbp)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->close(dbp, 0);
   warning("'db' handle may not be accessed again");
@@ -110,7 +111,7 @@ SEXP rberkeley_db_compact (SEXP _dbp, SEXP _txnid, SEXP _start,
   /*memset(&end, 0, sizeof(end));*/
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->compact(dbp, txnid, &start, &stop, NULL, flags, &end); 
@@ -131,7 +132,7 @@ SEXP rberkeley_db_del(SEXP _dbp, SEXP _key)
 	key.size = strlen(key.data)+1;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
 	if ((ret = dbp->del(dbp, NULL, &key, 0)) == 0)
@@ -175,7 +176,7 @@ SEXP rberkeley_db_exists (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
   } 
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   if(!isNull(_txnid)) {
@@ -201,7 +202,7 @@ SEXP rberkeley_db_fd (SEXP _dbp)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->fd(dbp, &fdp);
 
@@ -230,7 +231,7 @@ SEXP rberkeley_db_get(SEXP _dbp, SEXP _key)
   }
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   if ((ret = dbp->get(dbp, NULL, &key, &data, 0)) == 0) {
@@ -252,7 +253,7 @@ SEXP rberkeley_db_get_byteswapped (SEXP _dbp)
   int ret, isswapped;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->get_byteswapped(dbp, &isswapped);
@@ -273,7 +274,7 @@ SEXP rberkeley_db_get_dbname (SEXP _dbp)
   PROTECT(getnames = allocVector(VECSXP, 2));
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->get_dbname(dbp, &filenamep, &dbnamep);
 
@@ -305,7 +306,7 @@ SEXP rberkeley_db_get_multiple (SEXP _dbp) {
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->get_multiple(dbp);
@@ -321,7 +322,7 @@ SEXP rberkeley_db_get_open_flags (SEXP _dbp)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->get_open_flags(dbp, &flagsp);
@@ -338,7 +339,7 @@ SEXP rberkeley_db_get_type (SEXP _dbp)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->get_type(dbp, &type);
 
@@ -380,7 +381,7 @@ SEXP rberkeley_db_key_range (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
   key.size = length(_key);
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
  
   ret = dbp->key_range(dbp, txnid, &key, &key_range, flags); 
@@ -420,7 +421,7 @@ SEXP rberkeley_db_open (SEXP _dbp,
   const char * file, * database;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
     if(!isNull(_txnid)) {
@@ -478,7 +479,7 @@ SEXP rberkeley_db_put(SEXP _dbp, SEXP _key, SEXP _data)
   }
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
 /*
@@ -510,7 +511,7 @@ SEXP rberkeley_db_remove (SEXP _dbp, SEXP _file, SEXP _database)
   }
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->remove(dbp,
                     (const char *)CHAR(STRING_ELT(_file,0)),
@@ -529,7 +530,7 @@ SEXP rberkeley_db_rename (SEXP _dbp, SEXP _file, SEXP _database,
   u_int32_t flags = 0;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->rename(dbp, 
                     (const char *)CHAR(STRING_ELT(_file,0)),
@@ -548,7 +549,7 @@ SEXP rberkeley_db_set_priority (SEXP _dbp, SEXP _priority)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   priority = (DB_CACHE_PRIORITY)INTEGER(_priority)[0];
 
@@ -566,7 +567,7 @@ error("currently unavailable in R");
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
 Rprintf("before\n");
@@ -606,7 +607,7 @@ SEXP rberkeley_db_stat_print (SEXP _dbp, SEXP _flags)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   flags = (u_int32_t)INTEGER(_flags)[0];
 
@@ -622,7 +623,7 @@ SEXP rberkeley_db_sync(SEXP _dbp)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->sync(dbp, 0);
   return(ScalarInteger(ret));
@@ -637,7 +638,7 @@ SEXP rberkeley_db_truncate (SEXP _dbp, SEXP _txnid)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   if(!isNull(_txnid)) {
@@ -658,7 +659,7 @@ SEXP  rberkeley_db_upgrade (SEXP _dbp, SEXP _file, SEXP _flags)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   flags = (u_int32_t)INTEGER(_flags)[0];
 
@@ -685,7 +686,7 @@ SEXP rberkeley_db_set_cachesize (SEXP _dbp, SEXP _gbytes,
   ncache = (int)INTEGER(_ncache)[0];
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->set_cachesize(dbp, gbytes, bytes, ncache);
 
@@ -700,7 +701,7 @@ SEXP rberkeley_db_get_cachesize (SEXP _dbp)
   u_int32_t gbytesp, bytesp;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
   ret = dbp->get_cachesize(dbp, &gbytesp, &bytesp, &ncachep);
 
@@ -726,7 +727,7 @@ SEXP rberkeley_db_set_encrypt (SEXP _dbp, SEXP _passwd, SEXP _flags)
   u_int32_t flags;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   passwd = CHAR(STRING_ELT(_passwd, 0));
@@ -745,7 +746,7 @@ SEXP rberkeley_db_get_encrypt_flags (SEXP _dbp)
   u_int32_t flagsp;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->get_encrypt_flags(dbp, &flagsp);
@@ -758,24 +759,89 @@ SEXP rberkeley_db_get_encrypt_flags (SEXP _dbp)
 /* }}} */
 /* rberkeley_db_set_errcall */
 /* rberkeley_db_set_msgcall  */
-/* rberkeley_db_set_errfile */
+/* {{{ rberkeley_db_set_errfile */
+SEXP rberkeley_db_set_errfile (SEXP _dbp, SEXP _errfile)
+{
+  DB *dbp;
+  FILE *errfile = NULL;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+    error("invalid 'db' handle");
+
+  if(!isNull(_errfile)) {
+    /* highly unlikely to be portable --- FIXME */
+    errfile = fopen(CHAR(STRING_ELT(_errfile,0)),"w");
+    if(errfile == NULL)
+      error("open failed!\n");
+  } else errfile = NULL;
+
+  dbp->set_errfile(dbp, errfile);
+  if(errfile == NULL) {
+    return R_NilValue;
+  } else {
+  SEXP ptr = R_MakeExternalPtr(errfile, install("errfile"), R_NilValue);
+  R_RegisterCFinalizer(ptr, (R_CFinalizer_t) rberkeley_fclose);
+  return ptr;
+  } 
+}
+/* }}} */
 /* {{{ rberkeley_db_set_msgfile */
 SEXP rberkeley_db_set_msgfile (SEXP _dbp, SEXP _msgfile)
 {
   DB *dbp;
-  FILE * msgfile = NULL;
+  FILE *msgfile = NULL;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
-  
-  msgfile = (FILE *)R_ExternalPtrAddr(_msgfile);
+
+  if(!isNull(_msgfile)) {
+    msgfile = fopen(CHAR(STRING_ELT(_msgfile,0)),"w");
+    if(msgfile == NULL)
+      error("open failed!\n");
+  } else msgfile = NULL;
 
   dbp->set_msgfile(dbp, msgfile);
-  return R_NilValue;
+  if(msgfile == NULL) {
+    return R_NilValue;
+  } else {
+  SEXP ptr = R_MakeExternalPtr(msgfile, install("msgfile"), R_NilValue);
+  R_RegisterCFinalizer(ptr, (R_CFinalizer_t) rberkeley_fclose);
+  return ptr;
+  } 
 }
 /* }}} */
-/* rberkeley_db_set_errpfx */
+/* {{{ rberkeley_db_set_errpfx */
+SEXP rberkeley_db_set_errpfx (SEXP _dbp, SEXP _errpfx)
+{
+  DB *dbp;
+  const char *errpfx = CHAR(STRING_ELT(_errpfx,0));
+
+  //memcpy(&errpfx, ep, strlen(CHAR(STRING_ELT(_errpfx,0))));
+  
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+    error("invalid 'db' handle");
+
+  dbp->set_errpfx(dbp, errpfx);
+  return R_MakeExternalPtr(&errpfx, install("errpfx"), R_NilValue);
+}
+/* }}} */
+/* {{{ rberkeley_db_get_errpfx */
+SEXP rberkeley_db_get_errpfx (SEXP _dbp)
+{
+  DB *dbp;
+  const char *errpfx;
+  
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+    error("invalid 'db' handle");
+
+  dbp->get_errpfx(dbp, &errpfx);
+  return R_MakeExternalPtr(&errpfx, install("errpfx"), R_NilValue);
+}
+/* }}} */
 /* rberkeley_db_set_feedback */
 /* {{{ rberkeley_db_set_flags */
 SEXP rberkeley_db_set_flags (SEXP _dbp, SEXP _flags)
@@ -785,7 +851,7 @@ SEXP rberkeley_db_set_flags (SEXP _dbp, SEXP _flags)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   flags = (u_int32_t)INTEGER(_flags)[0];
@@ -803,7 +869,7 @@ SEXP rberkeley_db_get_flags (SEXP _dbp)
   int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->get_flags(dbp, &flags);
@@ -823,7 +889,7 @@ SEXP rberkeley_db_set_lorder (SEXP _dbp, SEXP _lorder)
   lorder = INTEGER(_lorder)[0];
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->set_lorder(dbp, lorder);
@@ -838,7 +904,7 @@ SEXP rberkeley_db_get_lorder (SEXP _dbp)
   int lorder;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->get_lorder(dbp, &lorder);
@@ -857,7 +923,7 @@ SEXP rberkeley_db_set_pagesize (SEXP _dbp, SEXP _pagesize)
   pagesize = INTEGER(_pagesize)[0];
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->set_pagesize(dbp, pagesize);
@@ -873,7 +939,7 @@ SEXP rberkeley_db_get_pagesize (SEXP _dbp)
   u_int32_t pagesize;
 
   dbp = R_ExternalPtrAddr(_dbp);
-  if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
   ret = dbp->get_pagesize(dbp, &pagesize);
