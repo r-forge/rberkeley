@@ -16,8 +16,8 @@ SEXP mkFlags (SEXP _flags)
 {
   SEXP flags;
   char * cur_string;
-  int len_flags = length(flags);
-  int flags_bit=0x0;
+  int len_flags = length(_flags);
+  u_int32_t flags_bit=0x0;
   int i;
 
   for(i = 0; i < len_flags; i++) {
