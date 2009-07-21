@@ -12,6 +12,7 @@ AC_PROG_CC
 # Check for db.h in a few odd locations
 AC_MSG_NOTICE([checking for db file])
 for dir in \
+    /usr/local/BerkeleyDB.4.7/include \
     /usr/include \
     /usr/local/include \
     /opt/include 
@@ -27,16 +28,17 @@ done
 # no explicit action on found, error on failure
 AC_CHECK_FILE(["${DB_INCDIR}/db.h"],
 	,
-	AC_MSG_ERROR([File libdb.h not in ${DB_INCDIR}.]))
+	AC_MSG_ERROR([File db.h not in ${DB_INCDIR}.]))
 
-# Now search for libdieharder.so
+# Now search for BerkeleyDB.4.7 directory
 AC_MSG_NOTICE([checking for DB library file])
 for dir in \
+    /usr/local/BerkeleyDB.4.7/lib \
 	/usr/lib \
 	/usr/local/lib \
 	/opt/lib/  
 do
-    if test -f ${dir}/libdb.so
+    if test -f ${dir}/libdb.so || test -f ${dir}/libdb-4.7.dylib 
 	then 
 	    DB_LIBDIR=${dir}
 	    break
@@ -45,9 +47,9 @@ done
 
 # Test for sanity by looking for libdb.so, 
 # no explicit action on found, error on failure
-AC_CHECK_FILE(["${DB_LIBDIR}/libdb.so"],
-	,
-	AC_MSG_ERROR([Library libdb.so not in ${DH_LIBDIR}.]))
+#AC_CHECK_FILE(["${DB_LIBDIR}/libdb.so"],
+#	,
+#	AC_MSG_ERROR([Library libdb.so not in ${DH_LIBDIR}.]))
 
 # Expand into arguments
 DB_CFLAGS="-I${DB_INCDIR} "
