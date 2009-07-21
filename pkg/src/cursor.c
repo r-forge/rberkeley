@@ -32,7 +32,7 @@ SEXP rberkeley_db_cursor (SEXP _dbp, SEXP _txnid, SEXP _flags)
   if(ret != 0)
     return ScalarInteger(ret);
 
-  return R_MakeExternalPtr(dbc, install("DBC"), R_NilValue);
+  return R_MakeExternalPtr(dbc, install("DBC"), ScalarLogical(TRUE));
 }
 /* }}} */
 /* {{{ rberkeley_dbcursor_close */
@@ -109,7 +109,7 @@ SEXP rberkeley_dbcursor_dup (SEXP _dbc, SEXP _flags)
   if(ret != 0)
     return ScalarInteger(ret);
 
-  return R_MakeExternalPtr(dbc2, install("DBC"), R_NilValue);
+  return R_MakeExternalPtr(dbc2, install("DBC"), ScalarLogical(TRUE));
 }
 /* }}} */
 /* {{{ rberkeley_dbcursor_get */

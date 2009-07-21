@@ -28,7 +28,7 @@ SEXP rberkeley_db_env_create (SEXP _flags)
   if(ret != 0)
     return ScalarInteger(ret);
 
-  return R_MakeExternalPtr(dbenvp, RBerkeley_DB_ENV, R_NilValue);
+  return R_MakeExternalPtr(dbenvp, RBerkeley_DB_ENV, ScalarLogical(TRUE));
 }
 /* }}} */
 /* {{{ rberkeley_db_get_env */
@@ -43,7 +43,7 @@ SEXP rberkeley_db_get_env (SEXP _dbp)
     error("invalid 'db' handle");
 
   dbenv = dbp->get_env(dbp);
-  return R_MakeExternalPtr(dbenv, R_NilValue, R_NilValue);
+  return R_MakeExternalPtr(dbenv, RBerkeley_DB_ENV, ScalarLogical(TRUE));
 }
 /* }}} */
 /* {{{ rberkeley_dbenv_close */

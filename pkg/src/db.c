@@ -51,16 +51,20 @@ SEXP rberkeley_db_create (SEXP _dbenv)
   DB_ENV *dbenv;
   int ret;
 
-  /* could use env instead of NULL... */
+  dbp = (DB *)Calloc(1, DB);
+
   if(isNull(_dbenv)) {
     ret = db_create(&dbp, NULL, 0);
   } else {
     dbenv = R_ExternalPtrAddr(_dbenv);
-    if(dbenv == NULL) error("invalid 'dbenv' handle");
+  if(R_ExternalPtrTag(_dbenv) != RBerkeley_DB_ENV || dbenv == NULL)
+    error("invalid 'dbenv' handle");
     ret = db_create(&dbp, dbenv, 0);
   }
-  if(ret==0)
-    return R_MakeExternalPtr(dbp, RBerkeley_DB, R_NilValue);
+  if(ret==0) {
+    SEXP ptr = R_MakeExternalPtr(dbp, RBerkeley_DB, ScalarLogical(TRUE));
+    return ptr;
+  }  
   return ScalarInteger(ret);
 }
 /* }}} */
@@ -780,7 +784,7 @@ SEXP rberkeley_db_set_errfile (SEXP _dbp, SEXP _errfile)
   if(errfile == NULL) {
     return R_NilValue;
   } else {
-  SEXP ptr = R_MakeExternalPtr(errfile, install("errfile"), R_NilValue);
+  SEXP ptr = R_MakeExternalPtr(errfile, install("errfile"), ScalarLogical(TRUE));
   R_RegisterCFinalizer(ptr, (R_CFinalizer_t) rberkeley_fclose);
   return ptr;
   } 
@@ -806,7 +810,7 @@ SEXP rberkeley_db_set_msgfile (SEXP _dbp, SEXP _msgfile)
   if(msgfile == NULL) {
     return R_NilValue;
   } else {
-  SEXP ptr = R_MakeExternalPtr(msgfile, install("msgfile"), R_NilValue);
+  SEXP ptr = R_MakeExternalPtr(msgfile, install("msgfile"), ScalarLogical(TRUE));
   R_RegisterCFinalizer(ptr, (R_CFinalizer_t) rberkeley_fclose);
   return ptr;
   } 
@@ -825,7 +829,7 @@ SEXP rberkeley_db_set_errpfx (SEXP _dbp, SEXP _errpfx)
     error("invalid 'db' handle");
 
   dbp->set_errpfx(dbp, errpfx);
-  return R_MakeExternalPtr(&errpfx, install("errpfx"), R_NilValue);
+  return R_MakeExternalPtr(&errpfx, install("errpfx"), ScalarLogical(TRUE));
 }
 /* }}} */
 /* {{{ rberkeley_db_get_errpfx */
@@ -839,7 +843,7 @@ SEXP rberkeley_db_get_errpfx (SEXP _dbp)
     error("invalid 'db' handle");
 
   dbp->get_errpfx(dbp, &errpfx);
-  return R_MakeExternalPtr(&errpfx, install("errpfx"), R_NilValue);
+  return R_MakeExternalPtr(&errpfx, install("errpfx"), ScalarLogical(TRUE));
 }
 /* }}} */
 /* rberkeley_db_set_feedback */
