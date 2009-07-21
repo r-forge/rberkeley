@@ -1,0 +1,60 @@
+# Process this file with autoconf to produce a configure script.
+#
+# Configure.in for RBerkeley
+# Copyright (C) 2009 Dirk Eddelbuettel and licensed under GNU GPL
+
+# The version set here will propagate to other files from here
+AC_INIT(RBerkeley, 0.0-1)
+
+# Checks for common programs using default macros
+AC_PROG_CC
+
+# Check for db.h in a few odd locations
+AC_MSG_NOTICE([checking for db file])
+for dir in \
+    /usr/include \
+    /usr/local/include \
+    /opt/include 
+do
+    if test -f ${dir}/db.h
+    then 
+        DB_INCDIR=${dir}
+	break
+    fi
+done
+
+# Test for sanity by looking for libdb
+# no explicit action on found, error on failure
+AC_CHECK_FILE(["${DB_INCDIR}/db.h"],
+	,
+	AC_MSG_ERROR([File libdb.h not in ${DB_INCDIR}.]))
+
+# Now search for libdieharder.so
+AC_MSG_NOTICE([checking for DB library file])
+for dir in \
+	/usr/lib \
+	/usr/local/lib \
+	/opt/lib/  
+do
+    if test -f ${dir}/libdb.so
+	then 
+	    DB_LIBDIR=${dir}
+	    break
+	fi
+done
+
+# Test for sanity by looking for libdb.so, 
+# no explicit action on found, error on failure
+AC_CHECK_FILE(["${DB_LIBDIR}/libdb.so"],
+	,
+	AC_MSG_ERROR([Library libdb.so not in ${DH_LIBDIR}.]))
+
+# Expand into arguments
+DB_CFLAGS="-I${DB_INCDIR} "
+DB_LIBS="-L${DB_LIBDIR} -ldb"
+
+# Now substitute these variables in src/Makevars.in to create src/Makevars
+AC_SUBST(DB_CFLAGS)
+AC_SUBST(DB_LIBS)
+AC_OUTPUT(src/Makevars)
+ 
