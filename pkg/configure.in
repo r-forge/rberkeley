@@ -9,26 +9,58 @@ AC_INIT(RBerkeley, 0.0-1)
 # Checks for common programs using default macros
 AC_PROG_CC
 
-# Check for db.h in a few odd locations
-AC_MSG_NOTICE([checking for db file])
-for dir in \
-    /usr/local/BerkeleyDB.4.7/include \
-    /usr/include \
-    /usr/local/include \
-    /opt/include 
-do
-    if test -f ${dir}/db.h
-    then 
-        DB_INCDIR=${dir}
-	break
-    fi
-done
+# Use standard test for db.h
+AC_CHECK_HEADER([db.h], [db_h=1], [db_h=0])
 
-# Test for sanity by looking for libdb
-# no explicit action on found, error on failure
-AC_CHECK_FILE(["${DB_INCDIR}/db.h"],
-	,
-	AC_MSG_ERROR([File db.h not in ${DB_INCDIR}.]))
+# If not found, 
+if test $db_h == 0; then
+    #AC_MSG_ERROR("db.h not found. Please install the Oracle Berkely nDB")
+    AC_MSG_NOTICE([db.h not found. Looking at configure switch --with-db-include.])
+
+    # offer configure argument support for dieharder includes
+    AC_ARG_WITH([db-include],
+            AC_HELP_STRING([--with-db-include=INCLUDE_PATH],
+                           [Use this location of Oracle Berkeley DB header files]),
+            [db_include_path=$withval],
+            [db_include_path=""])
+
+    if test [ -n "$db_include_path" ]; then
+        if test -f ${db_include_path}/db.h; then 
+	    DB_INCDIR="$db_include_path"
+        else
+    	    AC_MSG_ERROR([db.h not found in ${db_include_path}.])
+        fi
+    else 
+    	AC_MSG_ERROR([db.h not found and no directory submitted. Please install the Oracle Berkely DB and/or set the configure switch.])
+    fi
+
+else 
+    #AC_MSG_NOTICE("db.h found. All is well")
+    # DB_INCDIR is used below
+    DB_INCDIR=.
+fi
+
+
+## Check for db.h in a few odd locations
+#AC_MSG_NOTICE([checking for db file])
+#for dir in \
+#    /usr/local/BerkeleyDB.4.7/include \
+#    /usr/include \
+#    /usr/local/include \
+#    /opt/include 
+#do
+#    if test -f ${dir}/db.h
+#    then 
+#        DB_INCDIR=${dir}
+#	break
+#    fi
+#done
+
+## Test for sanity by looking for libdb
+## no explicit action on found, error on failure
+#AC_CHECK_FILE(["${DB_INCDIR}/db.h"],
+#	,
+#	AC_MSG_ERROR([File db.h not in ${DB_INCDIR}.]))
 
 # Now search for BerkeleyDB.4.7 directory
 AC_MSG_NOTICE([checking for DB library file])
