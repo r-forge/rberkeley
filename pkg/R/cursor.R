@@ -46,7 +46,7 @@ dbcursor_put <- function(dbc, key, data, flags)
 dbcursor_set_priority <- function(dbc, priority)
 {
   if(missing(priority))
-    priority <- mkFlags(DB_PRIORITY_DEFAULT)
+    priority <- mkFlags("DB_PRIORITY_DEFAULT")
 
   .Call("rberkeley_dbcursor_set_priority", dbc, priority)
 }

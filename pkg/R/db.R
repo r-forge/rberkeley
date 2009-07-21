@@ -120,7 +120,7 @@ db_get_pagesize <- function(dbh)
 db_set_encrypt <- function(dbh, passwd, flags)
 {
   if(missing(flags))
-    flags = mkFlags(DB_ENCRYPT_AES)
+    flags = mkFlags("DB_ENCRYPT_AES")
   
   .Call("rberkeley_db_set_encrypt", as.DB(dbh), passwd, flags)
 }

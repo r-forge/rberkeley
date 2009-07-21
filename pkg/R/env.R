@@ -1,5 +1,5 @@
-db_env_create <- function(flags) {
-  .Call("rberkeley_db_env_create", flags)
+db_env_create <- function(flags=0L) {
+  .Call("rberkeley_db_env_create", as.integer(flags))
 }
 
 db_get_env <- function(dbh)
@@ -14,12 +14,12 @@ dbenv_remove <- function(dbenv, db_home, flags=0L)
 
 dbenv_dbremove <- function(dbenv, txnid=NULL, file, database, flags)
 {
-  .Call("rberkeley_dbenv_dbremove", dbh, txnid, file, database, as.integer(flags))
+  .Call("rberkeley_dbenv_dbremove", dbenv, txnid, file, database, as.integer(flags))
 }
 
 dbenv_dbrename <- function(dbenv, txnid=NULL, file, database, newname, flags)
 {
-  .Call("rberkeley_dbenv_dbrename", dbh, txnid, file, database, 
+  .Call("rberkeley_dbenv_dbrename", dbenv, txnid, file, database, 
         newname, as.integer(flags))
 }
 

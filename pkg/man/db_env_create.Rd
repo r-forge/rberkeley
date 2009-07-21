@@ -1,6 +1,6 @@
 \name{db_env_create}
 \Rdversion{1.1}
-\alias{db__env_create}
+\alias{db_env_create}
 \title{
 Create An Environment Handle
 }
