@@ -1,0 +1,12 @@
+To install RBerkeley, it is required that you have the BerkeleyDB 4.7.25
+version installed in the standard place.
+
+This package makes use of a Makevars file in the src directory.
+
+It is currently set to the default installation location of DB when
+built from source.  If yours differs, please change the Makevars accordingly:
+
+    PKG_LIBS= -L/usr/local/BerkeleyDB.4.7/lib -ldb
+    PKG_CFLAGS= -I/usr/local/BerkeleyDB.4.7/include
+
+A configuration script to automate this is on the way...

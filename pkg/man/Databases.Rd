@@ -5,7 +5,6 @@
 \alias{db_associate}
 \alias{db_close}
 \alias{db_compact}
-\alias{db_cursor}
 \alias{db_del}
 \alias{db_err}
 \alias{db_errx}
@@ -70,20 +69,20 @@ be all that is required to correctly use this API.
   \emph{Database Operations} \tab \emph{Description}\cr
   \tab \cr
   db_create \tab   Create a database handle\cr
-  db_associate \tab   Associate a secondary index\cr
+  db_associate* \tab   Associate a secondary index\cr
   db_close \tab   Close a database\cr
   db_compact \tab Compact a database\cr
   db_cursor \tab  Create a cursor\cr
   db_del \tab Delete items from a database\cr
-  db_err \tab Error message\cr
-  db_errx \tab  Error message\cr
+  db_err* \tab Error message\cr
+  db_errx* \tab  Error message\cr
   db_exists \tab  Return if an item appears in a database\cr
   db_fd \tab  Return a file descriptor from a database\cr
   db_get \tab   Get items from a database\cr
-  db_pget \tab  Get items from a database\cr
+  db_pget* \tab  Get items from a database\cr
   db_get_byteswapped \tab Return if the underlying database is in host order\cr
   db_get_type \tab    Return the database type\cr
-  db_join \tab    Perform a database join on cursors\cr
+  db_join* \tab    Perform a database join on cursors\cr
   db_key_range \tab   Return estimate of key location\cr
   db_open \tab    Open a database\cr
   db_put \tab Store items into a database\cr
@@ -94,22 +93,22 @@ be all that is required to correctly use this API.
   db_sync \tab    Flush a database to stable storage\cr
   db_truncate \tab    Empty a database\cr
   db_upgrade \tab Upgrade a database\cr
-  db_verify \tab  Verify/salvage a database\cr
+  db_verify* \tab  Verify/salvage a database\cr
   db_strerror \tab  Error strings\cr
   db_version \tab  Return version information\cr
   \tab \cr
   \emph{Database Configuration} \tab \emph{Description}\cr
   \tab \cr
-  db_set_alloc \tab   Set local space allocation functions\cr
+  db_set_alloc* \tab   Set local space allocation functions\cr
   db_set_cachesize \tab   Set the database cache size\cr
-  db_set_dup_compare \tab Set a duplicate comparison function\cr
+  db_set_dup_compare* \tab Set a duplicate comparison function\cr
   db_set_encrypt \tab Set the database cryptographic key\cr
-  db_set_errcall \tab    Set error and informational message callback\cr
-  db_set_msgcall \tab    Set error and informational message callback\cr
+  db_set_errcall* \tab    Set error and informational message callback\cr
+  db_set_msgcall* \tab    Set error and informational message callback\cr
   db_set_errfile \tab    Set error and informational message FILE\cr
   db_set_msgfile \tab    Set error and informational message FILE\cr
   db_set_errpfx \tab  Set error message prefix\cr
-  db_set_feedback \tab    Set feedback callback\cr
+  db_set_feedback* \tab    Set feedback callback\cr
   db_set_flags \tab   General database configuration\cr
   db_set_lorder \tab  Set the database byte order\cr
   db_set_pagesize \tab    Set the underlying database page size\cr

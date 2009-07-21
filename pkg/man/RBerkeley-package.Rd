@@ -1,4 +1,6 @@
 \name{RBerkeley-package}
+\alias{RBerkeley}
+\alias{rberkeley}
 \Rdversion{1.1}
 \alias{RBerkeley-package}
 \docType{package}
@@ -17,17 +19,38 @@ entirety.
 
 The project will eventually include a higher-level
 interface to make using the DB from R easier.
+
+A large part of the API had been coded, though
+a much smaller subset is currently documented
+with respect to differences of design or necessity
+between \pkg{RBerkleley} and the C-API.
+
+Primary difference with respect to design include the
+automatic serialization of \R objects via \code{serialize}.
+This can be bypassed by providing a RAW type vector to the \code{get}
+and \code{put} operations.
+
+From a API perspective, some functions related to threads are
+not yet implemented, as they are not an absolute priority.  Additionally
+functions that require C level callback function pointers have also
+been intentionally skipped until a later time.
+
+All functions that appear in the \pkg{RBerkeley} documentation
+with an asterisk next to them are currently not available in the \R API.
 }
 \author{
 Jeffrey A. Ryan
 }
 \references{
-Oracle Berkey DB 4.7.25 \url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}
+Oracle Berkey DB 4.7.25\cr
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}
 }
 \keyword{ package }
 \seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
+\code{\link{Databases}},
+\code{\link{Environments}},
+\code{\link{Cursors}},
+\code{\link{Mutexes}}
 }
 \examples{
 \dontrun{
