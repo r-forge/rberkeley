@@ -117,7 +117,7 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
                              SEXP _key,
                              SEXP _data,
                              SEXP _flags,
-                             SEXP _n)
+                             SEXP _n /* non-API flag */)
 {
   DBC *dbc;
   DBT key, data;
@@ -137,12 +137,23 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
   SEXP results;
   PROTECT(results = allocVector(VECSXP, n)); P++;
   
+  /*
+    Three scenarios for DBcursor->get calls:
+    (1) key and data are SPECIFIED
+    (2) key is SPECIFIED, data is EMPTY
+    (3) key and data are EMPTY 
+
+    We must handle these seperately in order
+    to return a sensible result
+  */
   if( !isNull(_key) &&
       !isNull(_data)  ) {
+
     key.data = (unsigned char *)RAW(_key);
     key.size = length(_key);
     data.data = (unsigned char *)RAW(_data);
     data.size = length(_data);
+
     ret = dbc->get(dbc, &key, &data, flags);
     if(ret == 0) {
       SEXP rawdata;
@@ -153,8 +164,10 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
     }
   } else
   if( !isNull(_key) ) {
+
     key.data = (unsigned char *)RAW(_key);
     key.size = length(_key);
+
     ret = dbc->get(dbc, &key, &data, flags);
     if(ret == 0) {
       SEXP rawdata;
@@ -168,7 +181,7 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
 
   if(isNull(_key) && isNull(_data)) {
     for(i = 0; i < n; i++) {
-      ret = dbc->get(dbc, &key, &data, DB_NEXT);
+      ret = dbc->get(dbc, &key, &data, flags);
       if(ret == 0) {
         SEXP rawdata;
         PROTECT(rawdata = allocVector(RAWSXP, data.size));

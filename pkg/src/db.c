@@ -142,7 +142,7 @@ SEXP rberkeley_db_del(SEXP _dbp, SEXP _key)
 	if ((ret = dbp->del(dbp, NULL, &key, 0)) == 0)
 		Rprintf("db: %s: key was deleted.\n", (char *)key.data);
 	else {
-		dbp->err(dbp, ret, "DB->get");
+		dbp->err(dbp, ret, "DB->del");
 	}
     return R_NilValue;
 }
@@ -214,31 +214,33 @@ SEXP rberkeley_db_fd (SEXP _dbp)
 }
 /* }}} */
 /* {{{ rberkeley_db_get */
-SEXP rberkeley_db_get(SEXP _dbp, SEXP _key)
+SEXP rberkeley_db_get(SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _data, SEXP _flags)
 {
   DB *dbp;
   DBT key, data;
+  DB_ENV *txnid;
+  u_int32_t flags = INTEGER(_flags)[0];
   int ret;
 
   memset(&key, 0, sizeof(key));
   memset(&data, 0, sizeof(data));
 
-  switch(TYPEOF(_key)) {
-    case STRSXP:
-      key.data = (char *)CHAR(STRING_ELT(_key,0));
-      key.size = strlen(key.data)+1;
-      break;
-    case RAWSXP:
-      key.data = (unsigned char *)RAW(_key);
-      key.size = length(_key);
-      break;
+  key.data = (unsigned char *)RAW(_key);
+  key.size = length(_key);
+  if(!isNull(_data)) {
+    data.data = (unsigned char *)RAW(_data);
+    data.size = length(_data);
   }
 
   dbp = R_ExternalPtrAddr(_dbp);
   if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
-  if ((ret = dbp->get(dbp, NULL, &key, &data, 0)) == 0) {
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else txnid = NULL;
+
+  if ((ret = dbp->get(dbp, txnid, &key, &data, flags)) == 0) {
     SEXP retdata;
     PROTECT(retdata = allocVector(RAWSXP, data.size));
     memcpy(RAW(retdata), data.data, data.size);
@@ -452,52 +454,37 @@ SEXP rberkeley_db_open (SEXP _dbp,
 }
 /* }}} */
 /* {{{ rberkeley_db_put */
-SEXP rberkeley_db_put(SEXP _dbp, SEXP _key, SEXP _data)
+SEXP rberkeley_db_put(SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _data, SEXP _flags)
 {
   DB *dbp;
   DBT key, data;
+  DB_TXN *txnid;
+  u_int32_t flags = INTEGER(_flags)[0];
   int ret;
 
   memset(&key, 0, sizeof(key));
   memset(&data, 0, sizeof(data));
 
-  switch(TYPEOF(_key)) {
-    case STRSXP:
-      key.data = (char *)CHAR(STRING_ELT(_key,0));
-      key.size = strlen(key.data)+1;
-      break;
-    case RAWSXP:
-      key.data = (unsigned char *)RAW(_key);
-      key.size = length(_key);
-      break;
-  }
-  switch(TYPEOF(_data)) {
-/* need to memcpy for this to work I assume... */
-    case STRSXP:
-      data.data = (char *)CHAR(STRING_ELT(_data,0));
-      data.size = strlen(data.data)+1;
-      break;
-    case RAWSXP:
-      data.data = (unsigned char *)RAW(_data);
-      data.size = length(_data);
-  }
+  key.data = (unsigned char *)RAW(_key);
+  key.size = length(_key);
+  data.data = (unsigned char *)RAW(_data);
+  data.size = length(_data);
 
   dbp = R_ExternalPtrAddr(_dbp);
   if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
-/*
-Rprintf("data.size: %i\n", data.size);
-Rprintf("key.size: %i\n", key.size);
-*/
-	/* Store a key/data pair. */
-	if ((ret = dbp->put(dbp, NULL, &key, &data, 0)) == 0) {
-		/*Rprintf("db: %s: key stored.\n", (char *)key.data);*/
-        return ScalarInteger(ret);
-	} else {
-		dbp->err(dbp, ret, "DB->put");
-	}
-    return R_NilValue;
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else txnid = NULL;
+
+/* Store a key/data pair. */
+  if ((ret = dbp->put(dbp, txnid, &key, &data, flags)) == 0) {
+    return ScalarInteger(ret);
+  } else {
+    dbp->err(dbp, ret, "DB->put");
+  }
+  return R_NilValue;
 
 }
 /* }}} */
