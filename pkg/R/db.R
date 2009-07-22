@@ -49,23 +49,25 @@ db_get_flags <- function(dbh)
   .Call("rberkeley_db_get_flags", as.DB(dbh))
 }
 
-db_put <- function(dbh, key, data)
+db_put <- function(dbh, txnid=NULL, key, data, flags=0L)
 {
   if(!is.raw(key))
     key <- serialize(key, NULL)
   if(!is.raw(data))
     data <- serialize(data, NULL)
 
-  invisible(.Call("rberkeley_db_put", as.DB(dbh), key, data))
+  invisible(.Call("rberkeley_db_put", as.DB(dbh), txnid, key, data, as.integer(flags)))
 }
 
-db_get <- function(dbh, key)
+db_get <- function(dbh, txnid=NULL, key, data=NULL, flags=0L)
 {
   if(!is.raw(key))
     key <- serialize(key, NULL)
+  if(!is.null(data) && !is.raw(data))
+    data <- serialize(data, NULL)
 
   # should add error checking here... 
-  .Call("rberkeley_db_get", as.DB(dbh), key)
+  .Call("rberkeley_db_get", as.DB(dbh), txnid, key, data, as.integer(flags))
 }
 
 db_key_range <- function(dbh, txnid=NULL, key, flags=0L)
