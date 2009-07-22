@@ -8,8 +8,17 @@ db_strerror <- function(error)
 } 
 
 db_open <- function(dbh, txnid=NULL, file="access.db",
-                    database=NULL, flags=0L) {
-  .Call("rberkeley_db_open", as.DB(dbh), txnid, file, database, flags)
+                    database=NULL, type="BTREE", flags=0L) {
+  if(!is.numeric(type)) {
+  type <- switch(gsub("DB_","",toupper(type)), 
+                       BTREE  =1L,
+                       HASH   =2L,
+                       RECNO  =3L,
+                       QUEUE  =4L,
+                       UNKNOWN=5L)
+  if(is.null(type)) stop("'type' must be a one of BTREE, HASH, RECNO, QUEUE, or UNKNOWN")
+  }
+  .Call("rberkeley_db_open", as.DB(dbh), txnid, file, database, as.integer(type), flags)
 }
 
 db_close <- function(dbh) {

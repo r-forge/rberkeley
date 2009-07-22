@@ -1,6 +1,6 @@
 db_cursor <- function(dbh, txnid=NULL, flags=0L)
 {
-  .Call("rberkeley_db_cursor", dbh, txnid, flags)
+  .Call("rberkeley_db_cursor", as.DB(dbh), txnid, flags)
 }
 
 dbcursor_close <- function(dbc)

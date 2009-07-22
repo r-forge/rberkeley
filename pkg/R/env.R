@@ -89,9 +89,9 @@ dbenv_get_shm_key <- function(dbenv)
   .Call("rberkeley_dbenv_get_shm_key", dbenv)
 }
 
-dbenv_open <- function(dbenv, dbhome, flags, mode)
+dbenv_open <- function(dbenv, db_home, flags, mode)
 {
-  .Call("rberkeley_dbenv_open", dbenv, dbhome, flags, mode)
+  .Call("rberkeley_dbenv_open", dbenv, db_home, flags, mode)
 }
 
 dbenv_get_home <- function(dbenv)
