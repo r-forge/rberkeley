@@ -218,7 +218,7 @@ SEXP rberkeley_db_get(SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _data, SEXP _flags
 {
   DB *dbp;
   DBT key, data;
-  DB_ENV *txnid;
+  DB_TXN *txnid;
   u_int32_t flags = INTEGER(_flags)[0];
   int ret;
 
