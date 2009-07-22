@@ -112,6 +112,8 @@ rawToChar(db_get(dbh, key=charToRaw("key2"))) # what you expect, "value"
 db_get(dbh, key="key2")  # not there, must use symmetric marshalling/conversion
 
 db_close(dbh) # close DB
+dbh <- db_create()
+db_remove(dbh, "access.db", NULL)
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

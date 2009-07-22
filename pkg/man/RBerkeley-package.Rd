@@ -87,7 +87,7 @@ for(i in 1:1000)
 
 # get value by key
 db_get(dbh, key="myKey2")
-db_set_priority(dbh, flags=mkFlags(DB_PRIORITY_VERY_LOW))
+db_set_priority(dbh, priority=mkFlags(DB_PRIORITY_VERY_LOW))
 
 xr <- db_get(dbh, key="myKey2")
 
@@ -95,7 +95,7 @@ xr
 unserialize(xr)
 
 # cursors
-dbc <- db_cursor(attr(dbh,"conn_id"))
+dbc <- db_cursor(dbh)
 dbc2 <- dbcursor_dup(dbc)
 dbc2
 
@@ -115,7 +115,7 @@ dbcursor_get(dbc, key=NULL, data=NULL, flags=0L, n=2L) # get 2 records
 dbcursor_close(dbc)
 dbcursor_close(dbc2)
 
-dbc <- db_cursor(attr(dbh,"conn_id"))
+dbc <- db_cursor(dbh)
 dbcursor_get(dbc, key=NULL, data=NULL, flags=0L, n=-1L)
 db_stat_print(dbh)
 db_stat_print(dbh, flags=mkFlags(DB_FAST_STAT))
