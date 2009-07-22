@@ -13,22 +13,34 @@ Store and retrieve R objects as key/value pairs
 from a Berkeley DB.
 }
 \usage{
-db_put(dbh, key, data)
-db_get(dbh, key)
+db_put(dbh, txnid=NULL, key, data, flags=0L)
+db_get(dbh, txnid=NULL, key, data, flags=0L)
 
-dbcursor_put(dbh, key, data)
-dbcursor_get(dbh, key)
+dbcursor_put(dbc, key, data, flags)
+dbcursor_get(dbc, key, data, flags, n)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{dbh}{
 A DB handle to an open Berkeley database.
 }
+  \item{dbc}{
+A DBC handle to an open cursor.
+}
+  \item{txnid}{
+A DB_TXN transaction handle. (currently ignored)
+}
   \item{key}{
 An \R object, raw or will be coerced to raw.  See details.
 }
   \item{data}{
 An \R object, raw or will be coerced to raw.  See details.
+}
+  \item{flags}{
+A valid flag created with \code{mkFlags}.
+}
+  \item{n}{
+Elements to return.
 }
 }
 \details{
@@ -67,7 +79,7 @@ These functions are called for their database side effects.
 }
 \references{
 BerkeleyDB DB->put\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/db_put.html}
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/db_put.html}\cr\cr
 BerkeleyDB DB->get\cr
 \url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/db_get.html}
 }
@@ -88,16 +100,16 @@ to underlying design considerations.
 dbh <- db_create()
 db_open(dbh, flags=mkFlags(DB_CREATE))
 
-db_put(dbh, "key", "value")
+db_put(dbh, key="key", data="value")
 
-db_get(dbh, "key") # serialized "value"
-unserialize(db_get(dbh, "key")) # "value"
+db_get(dbh, key="key") # serialized "value"
+unserialize(db_get(dbh, key="key")) # "value"
 
-db_put(dbh, charToRaw("key2"), charToRaw("value"))
-db_get(dbh, charToRaw("key2"))
-rawToChar(db_get(dbh, charToRaw("key2"))) # what you expect, "value"
+db_put(dbh, key=charToRaw("key2"), data=charToRaw("value"))
+db_get(dbh, key=charToRaw("key2"))
+rawToChar(db_get(dbh, key=charToRaw("key2"))) # what you expect, "value"
 
-db_get(dbh, "key2")  # not there, must use symmetric marshalling/conversion
+db_get(dbh, key="key2")  # not there, must use symmetric marshalling/conversion
 
 db_close(dbh) # close DB
 }

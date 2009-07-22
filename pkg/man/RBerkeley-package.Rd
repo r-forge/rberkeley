@@ -67,29 +67,29 @@ db_get_flags(dbh)
 db_get_dbname(dbh)
 
 # look for non-existant key
-db_get(dbh, "mykey")
+db_get(dbh, key="mykey")
 
 # add a key=>value
-db_put(dbh, charToRaw("myKey"), "myValue")
+db_put(dbh, key=charToRaw("myKey"), data="myValue")
 x <- matrix(1:10)
-db_put(dbh, "myKey2", x)
-db_put(dbh, "myKey3", "newValue")
-db_put(dbh, "myKey4", "myValue")
+db_put(dbh, key="myKey2", data=x)
+db_put(dbh, key="myKey3", data="newValue")
+db_put(dbh, key="myKey4", data="myValue")
 db_key_range(dbh, key="myKey2")
 
 # add a few hundred keys/values
 system.time(
 for(i in 1:1000)
 {
-  db_put(dbh, i, x) 
+  db_put(dbh, key=i, data=x) 
 }
 )
 
 # get value by key
-db_get(dbh, "myKey2")
-db_set_priority(dbh, mkFlags(DB_PRIORITY_VERY_LOW))
+db_get(dbh, key="myKey2")
+db_set_priority(dbh, flags=mkFlags(DB_PRIORITY_VERY_LOW))
 
-xr <- db_get(dbh, "myKey2")
+xr <- db_get(dbh, key="myKey2")
 
 xr
 unserialize(xr)
@@ -100,29 +100,29 @@ dbc2 <- dbcursor_dup(dbc)
 dbc2
 
 dbcursor_get_priority(dbc)
-dbcursor_set_priority(dbc, mkFlags(DB_PRIORITY_LOW))
+dbcursor_set_priority(dbc, flags=mkFlags(DB_PRIORITY_LOW))
 dbcursor_get_priority(dbc)
-dbcursor_get(dbc, NULL, NULL, 0L, 1L)
+dbcursor_get(dbc, key=NULL, data=NULL, flags=0L, n=1L)
 
 # using mkFlags for bitwise OR operations on DB constants
 mkFlags(DB_SET);
 
-dbcursor_get(dbc2, "myKey2", NULL, mkFlags(DB_SET), 1L)
-dbcursor_put(dbc2, "mynewKey", "MyNewValue", mkFlags(DB_KEYFIRST))
-dbcursor_get(dbc2, "myKey2", NULL, mkFlags(DB_PREV), 1L)
-dbcursor_get(dbc2, "myKey2", NULL, mkFlags(DB_FIRST), 1L)
-dbcursor_get(dbc, NULL, NULL, 0L, 2L)
+dbcursor_get(dbc2, key="myKey2", data=NULL, flags=mkFlags(DB_SET), n=1L)
+dbcursor_put(dbc2, key="mynewKey", data="MyNewValue", flags=mkFlags(DB_KEYFIRST))
+dbcursor_get(dbc2, key="myKey2", data=NULL, flags=mkFlags(DB_PREV), n=1L)
+dbcursor_get(dbc2, key="myKey2", data=NULL, flags=mkFlags(DB_FIRST), n=1L)
+dbcursor_get(dbc, key=NULL, data=NULL, flags=0L, n=2L) # get 2 records
 dbcursor_close(dbc)
 dbcursor_close(dbc2)
 
 dbc <- db_cursor(attr(dbh,"conn_id"))
-dbcursor_get(dbc, NULL, NULL, 0L, -1L)
+dbcursor_get(dbc, key=NULL, data=NULL, flags=0L, n=-1L)
 db_stat_print(dbh)
-db_stat_print(dbh, mkFlags(DB_FAST_STAT))
+db_stat_print(dbh, flags=mkFlags(DB_FAST_STAT))
 dbcursor_close(dbc)
 
 db_exists(dbh, NULL, "myKey2", 0L)
-db_get(dbh,"myKey")
+db_get(dbh,key="myKey")
 
 # flush to disk
 db_sync(dbh)

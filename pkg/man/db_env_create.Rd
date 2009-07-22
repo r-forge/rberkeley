@@ -24,7 +24,7 @@ A database environment handle.
 }
 \references{
 Oracle Berkeley DB API\cr
-\url{file:///Users/jryan/Desktop/db-4.7.25/docs/index.html}
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}\cr
 }
 \author{
 Jeffrey A. Ryan

@@ -122,9 +122,9 @@ Varies by function call.
 }
 \references{
 Oracle Berkeley DB\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}\cr\cr
 Oracle Berkeley DB C API\cr
-\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/frame.html}
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/frame.html}\cr\cr
 Oracle Berkeley DB Reference Guide\cr
 \url{http://www.oracle.com/technology/documentation/berkeley-db/db/ref/toc.html}
 }
