@@ -23,7 +23,7 @@ dbcursor_dup <- function(dbc, flags=0L)
   .Call("rberkeley_dbcursor_dup", dbc, as.integer(flags))
 }
 
-dbcursor_get <- function(dbc, key, data, flags, n)
+dbcursor_get <- function(dbc, key, data, flags, n=1L)
 {
   if(missing(key))
     key <- NULL
@@ -33,8 +33,12 @@ dbcursor_get <- function(dbc, key, data, flags, n)
     key <- serialize(key, NULL)
   if(!is.null(data) && !is.raw(data))
     data <- serialize(data, NULL)
-  if(is.null(key) && is.null(data) && missing(flags))
+  if(is.null(key) && is.null(data) && missing(flags)) {
     flags <- mkFlags("DB_NEXT") # simply set this here
+  } else {
+    if(missing(flags))
+      stop("a valid flag must be set")
+  }
 
   .Call("rberkeley_dbcursor_get", dbc, key, data, as.integer(flags), as.integer(n))
 }

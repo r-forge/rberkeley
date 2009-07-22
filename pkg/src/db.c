@@ -124,27 +124,33 @@ SEXP rberkeley_db_compact (SEXP _dbp, SEXP _txnid, SEXP _start,
 }
 /* }}} */
 /* {{{ rberkeley_db_del */
-SEXP rberkeley_db_del(SEXP _dbp, SEXP _key)
+SEXP rberkeley_db_del(SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
 {
   DB *dbp;
-  DBT key, data;
+  DBT key;
+  DB_TXN *txnid;
+  u_int32_t flags;
   int ret;
 
-	memset(&key, 0, sizeof(key));
-	memset(&data, 0, sizeof(data));
-	key.data = (char *)CHAR(STRING_ELT(_key,0));
-	key.size = strlen(key.data)+1;
+  memset(&key, 0, sizeof(key));
+  key.data = (unsigned char *)RAW(_key);
+  key.size = length(_key);
 
   dbp = R_ExternalPtrAddr(_dbp);
   if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
-	if ((ret = dbp->del(dbp, NULL, &key, 0)) == 0)
-		Rprintf("db: %s: key was deleted.\n", (char *)key.data);
-	else {
-		dbp->err(dbp, ret, "DB->del");
-	}
-    return R_NilValue;
+  if(isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else {
+    txnid = NULL;
+  }
+
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = dbp->del(dbp, txnid, &key, flags);
+  
+  return ScalarInteger(ret);
 }
 /* }}} */
 /* rberkeley_db_err */
@@ -164,20 +170,10 @@ SEXP rberkeley_db_exists (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
     flags = (u_int32_t)INTEGER(_flags)[0];
   else flags=0;
 
-  flags = 0;
+  flags = 0; /* only accepts 0 */
 
-  switch(TYPEOF(_key)) {
-    case STRSXP:
-      key.data = (char *)CHAR(STRING_ELT(_key, 0));
-      key.size = strlen(key.data)+1;
-      break;
-    case RAWSXP:
-      key.data = (unsigned char *)RAW(_key);
-      key.size = length(_key);
-      break;
-    default:
-    error("unsupported key type");
-  } 
+  key.data = (unsigned char *)RAW(_key);
+  key.size = length(_key);
 
   dbp = R_ExternalPtrAddr(_dbp);
   if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
@@ -185,16 +181,10 @@ SEXP rberkeley_db_exists (SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
 
   if(!isNull(_txnid)) {
     txnid = R_ExternalPtrAddr(_txnid);
-    ret = dbp->exists(dbp, txnid, &key, flags);
-  } else {
-    ret = dbp->exists(dbp, NULL,  &key, 0);
-  }
-  
-  if(ret == DB_NOTFOUND)
-    return mkString("DB_NOTFOUND");
-  if(ret == DB_KEYEMPTY)
-    return mkString("DB_KEYEMPTY");
+  } else txnid = NULL;
 
+  ret = dbp->exists(dbp, txnid, &key, flags);
+  
   return ScalarInteger(ret);
 }
 /* }}} */
@@ -240,16 +230,14 @@ SEXP rberkeley_db_get(SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _data, SEXP _flags
     txnid = R_ExternalPtrAddr(_txnid);
   } else txnid = NULL;
 
-  if ((ret = dbp->get(dbp, txnid, &key, &data, flags)) == 0) {
+  ret = dbp->get(dbp, txnid, &key, &data, flags);
+  if(ret == 0) {
     SEXP retdata;
     PROTECT(retdata = allocVector(RAWSXP, data.size));
     memcpy(RAW(retdata), data.data, data.size);
     UNPROTECT(1);
     return retdata;
-  } else {
-    dbp->err(dbp, ret, "DB->get");
-    return R_NilValue;
-  }
+  } else return ScalarInteger(ret); 
 }
 /* }}} */
 /* {{{ rberkeley_db_get_byteswapped */
@@ -446,10 +434,8 @@ SEXP rberkeley_db_open (SEXP _dbp,
       database = CHAR(STRING_ELT(_database,0));
     }
 
-	if ((ret = dbp->open(dbp,
-	    txnid, file, database, DB_BTREE, flags, 0664)) != 0) {
-		dbp->err(dbp, ret, "%s", file);
-	}
+	ret = dbp->open(dbp, txnid, file, database, DB_BTREE, flags, 0664);
+
     return ScalarInteger(ret);
 }
 /* }}} */
