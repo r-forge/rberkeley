@@ -7,9 +7,7 @@
 \alias{dbcursor_count}
 \alias{dbcursor_del}
 \alias{dbcursor_dup}
-\alias{dbcursor_get}
 \alias{dbcursor_pget}
-\alias{dbcursor_put}
 \alias{dbcursor_set_priority}
 \alias{dbcursor_get_priority}
 

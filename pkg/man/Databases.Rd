@@ -10,14 +10,12 @@
 \alias{db_errx}
 \alias{db_exists}
 \alias{db_fd}
-\alias{db_get}
 \alias{db_pget}
 \alias{db_get_byteswapped}
 \alias{db_get_type}
 \alias{db_join}
 \alias{db_key_range}
 \alias{db_open}
-\alias{db_put}
 \alias{db_remove}
 \alias{db_rename}
 \alias{db_set_priority}

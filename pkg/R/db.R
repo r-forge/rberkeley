@@ -56,7 +56,7 @@ db_put <- function(dbh, key, data)
   if(!is.raw(data))
     data <- serialize(data, NULL)
 
-  .Call("rberkeley_db_put", as.DB(dbh), key, data)
+  invisible(.Call("rberkeley_db_put", as.DB(dbh), key, data))
 }
 
 db_get <- function(dbh, key)
@@ -64,6 +64,7 @@ db_get <- function(dbh, key)
   if(!is.raw(key))
     key <- serialize(key, NULL)
 
+  # should add error checking here... 
   .Call("rberkeley_db_get", as.DB(dbh), key)
 }
 
