@@ -12,100 +12,100 @@ AC_PROG_CC
 
 # We default these to being empty for systems where db.h 
 # and libdb are found in standard places
-DB_CFLAGS=""
-DB_LIBS="-ldb"
-
-# Use standard test for db.h
-AC_CHECK_HEADER([db.h], [db_h=1], [db_h=0])
-
-# If found, good; else do more work
-if test $db_h == 1; then
-    AC_MSG_NOTICE([db.h found as a system header -- all is well. Unles we're on OS X])
-else 
-    #AC_MSG_ERROR([db.h not found. Please install the Oracle Berkely DB]")
-    AC_MSG_NOTICE([db.h not found. Looking at configure switch --with-db-include.])
-
-    # offer configure argument support for dieharder includes
-    AC_ARG_WITH([db-include],
-            AC_HELP_STRING([--with-db-include=INCLUDE_PATH],
-                           [Use this location for Oracle Berkeley DB header file]),
-            [db_include_path=$withval],
-            [db_include_path=""])
-
-    if test [ -n "$db_include_path" ]; then
-        if test -f ${db_include_path}/db.h; then 
-	    DB_INCDIR="$db_include_path"
-	    DB_CFLAGS="-I${DB_INCDIR} "
-        else
-    	    AC_MSG_ERROR([db.h not found in ${db_include_path}. Please correct this and try again.])
-        fi
-    else 
-    	AC_MSG_ERROR([db.h not found and no directory submitted. Please install the Oracle Berkely DB and/or set the configure switch.])
-    fi
-
-fi
-
-
-## Check for db.h in a few odd locations
-#AC_MSG_NOTICE([checking for db file])
-#for dir in \
-#    /usr/local/BerkeleyDB.4.7/include \
-#    /usr/include \
-#    /usr/local/include \
-#    /opt/include 
-#do
-#    if test -f ${dir}/db.h
-#    then 
-#        DB_INCDIR=${dir}
-#	break
+#DB_CFLAGS=""
+#DB_LIBS="-ldb"
+#
+## Use standard test for db.h
+#AC_CHECK_HEADER([db.h], [db_h=1], [db_h=0])
+#
+## If found, good; else do more work
+#if test $db_h == 1; then
+#    AC_MSG_NOTICE([db.h found as a system header -- all is well. Unles we're on OS X])
+#else 
+#    #AC_MSG_ERROR([db.h not found. Please install the Oracle Berkely DB]")
+#    AC_MSG_NOTICE([db.h not found. Looking at configure switch --with-db-include.])
+#
+#    # offer configure argument support for dieharder includes
+#    AC_ARG_WITH([db-include],
+#            AC_HELP_STRING([--with-db-include=INCLUDE_PATH],
+#                           [Use this location for Oracle Berkeley DB header file]),
+#            [db_include_path=$withval],
+#            [db_include_path=""])
+#
+#    if test [ -n "$db_include_path" ]; then
+#        if test -f ${db_include_path}/db.h; then 
+#	    DB_INCDIR="$db_include_path"
+#	    DB_CFLAGS="-I${DB_INCDIR} "
+#        else
+#    	    AC_MSG_ERROR([db.h not found in ${db_include_path}. Please correct this and try again.])
+#        fi
+#    else 
+#    	AC_MSG_ERROR([db.h not found and no directory submitted. Please install the Oracle Berkely DB and/or set the configure switch.])
 #    fi
-#done
+#
+#fi
+#
 
-## Test for sanity by looking for libdb
-## no explicit action on found, error on failure
-#AC_CHECK_FILE(["${DB_INCDIR}/db.h"],
-#	,
-#	AC_MSG_ERROR([File db.h not in ${DB_INCDIR}.]))
-
-# Check for libdb
-AC_SEARCH_LIBS([db_version], [db], [have_libdb=1], [have_libdb=0])
-
-# If found, good; else more work
-if test $have_libdb == 1; then
-    AC_MSG_NOTICE([libdb found. All is well. Unless, well, yes. That again.])
-else 
-    AC_MSG_NOTICE([libdb not found. Looking at configure switch --with-db-lib.])
-
-    # offer configure argument support for dieharder includes
-    AC_ARG_WITH([db-lib],
-            AC_HELP_STRING([--with-db-lib=LIBRARY_PATH],
-                           [Use this location for Oracle Berkeley DB library]),
-            [db_lib_path=$withval],
-            [db_lib_path=""])
-
-    if test [ -n "$db_lib_path" ]; then
-	DB_LIBDIR="$db_lib_path"
-	DB_LIBS="-L${DB_LIBDIR} -ldb"
-    else 
-    	AC_MSG_ERROR([libdb not found and no directory submitted. Please install the Oracle Berkely DB and/or set the configure switch.])
+# Check for db.h in a few odd locations
+AC_MSG_NOTICE([checking for db.h in standard locations])
+for dir in \
+    /usr/local/BerkeleyDB.4.7/include \
+    /usr/include \
+    /usr/local/include \
+    /opt/include 
+do
+    if test -f ${dir}/db.h
+    then 
+        DB_INCDIR=${dir}
+	break
     fi
+done
 
-fi
+# Test for sanity by looking for libdb
+# no explicit action on found, error on failure
+AC_CHECK_FILE(["${DB_INCDIR}/db.h"],
+	,
+	AC_MSG_ERROR([File db.h not in ${DB_INCDIR}.]))
 
-## Now search for BerkeleyDB.4.7 directory
-#AC_MSG_NOTICE([checking for DB library file])
-#for dir in \
-#    /usr/local/BerkeleyDB.4.7/lib \
-#	/usr/lib \
-#	/usr/local/lib \
-#	/opt/lib/  
-#do
-#    if test -f ${dir}/libdb.so || test -f ${dir}/libdb-4.7.dylib 
-#	then 
-#	    DB_LIBDIR=${dir}
-#	    break
-#	fi
-#done
+## Check for libdb
+#AC_SEARCH_LIBS([db_version], [db], [have_libdb=1], [have_libdb=0])
+#
+## If found, good; else more work
+#if test $have_libdb == 1; then
+#    AC_MSG_NOTICE([libdb found. All is well. Unless, well, yes. That again.])
+#else 
+#    AC_MSG_NOTICE([libdb not found. Looking at configure switch --with-db-lib.])
+#
+#    # offer configure argument support for dieharder includes
+#    AC_ARG_WITH([db-lib],
+#            AC_HELP_STRING([--with-db-lib=LIBRARY_PATH],
+#                           [Use this location for Oracle Berkeley DB library]),
+#            [db_lib_path=$withval],
+#            [db_lib_path=""])
+#
+#    if test [ -n "$db_lib_path" ]; then
+#	DB_LIBDIR="$db_lib_path"
+#	DB_LIBS="-L${DB_LIBDIR} -ldb"
+#    else 
+#    	AC_MSG_ERROR([libdb not found and no directory submitted. Please install the Oracle Berkely DB and/or set the configure switch.])
+#    fi
+#
+#fi
+
+# Now search for BerkeleyDB.4.7 directory
+AC_MSG_NOTICE([checking for DB library file])
+for dir in \
+    /usr/local/BerkeleyDB.4.7/lib \
+	/usr/lib \
+	/usr/local/lib \
+	/opt/lib/  
+do
+    if test -f ${dir}/libdb.so || test -f ${dir}/libdb-4.7.dylib 
+	then 
+	    DB_LIBDIR=${dir}
+	    break
+	fi
+done
 
 # Test for sanity by looking for libdb.so, 
 # no explicit action on found, error on failure
@@ -114,8 +114,8 @@ fi
 #	AC_MSG_ERROR([Library libdb.so not in ${DH_LIBDIR}.]))
 
 # Expand into arguments
-#DB_CFLAGS="-I${DB_INCDIR} "
-#DB_LIBS="-L${DB_LIBDIR} -ldb"
+DB_CFLAGS="-I${DB_INCDIR} "
+DB_LIBS="-L${DB_LIBDIR} -ldb"
 
 # Now substitute these variables in src/Makevars.in to create src/Makevars
 AC_SUBST(DB_CFLAGS)
