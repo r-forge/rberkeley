@@ -402,41 +402,39 @@ SEXP rberkeley_db_open (SEXP _dbp,
                         SEXP _txnid, 
                         SEXP _file,
                         SEXP _database, 
-                        /*
                         SEXP _type,
-                        */
-                        SEXP _flags/*,
-                        SEXP _mode*/)
+                        SEXP _flags/*, SEXP _mode*/)
 {
   DB *dbp;
   DB_TXN *txnid;
-  int ret;
-  u_int32_t flags = INTEGER(_flags)[0];
+  DBTYPE type = (DBTYPE)INTEGER(_type)[0];
+  u_int32_t flags = (u_int32_t)INTEGER(_flags)[0];
   const char * file, * database;
+  int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
   if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
-    if(!isNull(_txnid)) {
-      txnid = R_ExternalPtrAddr(_txnid);
-    } else txnid = NULL;
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else txnid = NULL;
 
-    if(isNull(_file)) {
-      file = NULL;
-    } else {
-      file = CHAR(STRING_ELT(_file,0));
-    }
+  if(isNull(_file)) {
+    file = NULL;
+  } else {
+    file = CHAR(STRING_ELT(_file,0));
+  }
 
-    if(isNull(_database)) {
-      database = NULL;
-    } else {
-      database = CHAR(STRING_ELT(_database,0));
-    }
+  if(isNull(_database)) {
+    database = NULL;
+  } else {
+    database = CHAR(STRING_ELT(_database,0));
+  }
 
-	ret = dbp->open(dbp, txnid, file, database, DB_BTREE, flags, 0664);
+  ret = dbp->open(dbp, txnid, file, database, type, flags, 0664);
 
-    return ScalarInteger(ret);
+  return ScalarInteger(ret);
 }
 /* }}} */
 /* {{{ rberkeley_db_put */
