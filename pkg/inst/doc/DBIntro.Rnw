@@ -126,5 +126,21 @@ passing into the C level mkFlags function.  If illegal values are passed
 they will simply be ignored in the calculation, and produce a visible warning
 regarding the specific invalid flag or flags.
 
+<<mkFlags>>=
+mkFlags(DB_CREATE)
+mkFlags(DB_EXCL)
+mkFlags(DB_CREATE,DB_EXCL)
+mkFlags(DB_CREATE,DB_EXCL,DB_EXCL)
+<<mkFlagsWithWarning>>=
+mkFlags(DB_CREATE,DB_WRONG)
+@
+<<mkFlagsWarning, echo=FALSE>>=
+withCallingHandlers( {
+mkFlags(DB_CREATE,DB_WRONG)
+}, warning=function(w){ assign("last.warning", w, env=baseenv())})
+@
+last.warning
+@
+
 \end{document}
 
