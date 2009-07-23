@@ -29,10 +29,10 @@ include C, C++, Java and Tcl.  Contributed bindings exists
 in a variety of programming languages, including Perl, Python, and
 Ruby.
 
-RBerkeley adds an \R language binding to this pool of options.
+RBerkeley adds an {\tt R} language binding to this pool of options.
 
 This document is not to extoll the virtues of DB, but rather to
-provide a quick start to using the \R interface.  The general design
+provide a quick start to using the {\tt R} interface.  The general design
 philosophy of RBerkeley will be explained, and some small examples
 of using it in practice will be worked.
 
@@ -71,7 +71,7 @@ may need to alter your configuration files to build RBerkeley.
 
 \subsection*{Installing RBerkeley}
 Installing RBerkeley follows the standard R installation convention
-of:\cr
+of:
 
 {\tt R CMD INSTALL RBerkeley\_0.0-1.tar.gz}
 
