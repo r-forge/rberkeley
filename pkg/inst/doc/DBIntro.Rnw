@@ -90,34 +90,57 @@ to it and read them back.  This will give the most simplistic
 use case.
 
 Here we create a new database handle, and open our test database.
-<<dbopen, keep.source=TRUE>>=
-# create a database handle for use throughout
+<<loadRBerkeley, echo=FALSE>>=
 library(RBerkeley)
-dbh <- db_create()
-dbh # a DB handle object
-#
-# open a database, call it myDB.db
-db_open(dbh, txnid=NULL, file="myDB.db", type="BTREE", flags=mkFlags(DB_CREATE, DB_EXCL))
 @
 
-The first line loads the RBerkeley package into R.  From there
-we need to create a handle to open a database.  This can take some
+<<dbopen, keep.source=TRUE>>=
+dbh <- db_create()
+dbh # a DB handle object
+@
+First we need to create a handle to open a database.  {\tt db\_create} can take some
 additional parameters, but we use the defaults here.  The object returned
 is of class {\tt DB}.
 
-{\tt db\_open} actually opens the underlying database.  Once again,
-different flags may be passed in, as well as other parameters that will
-be covered in later documentation, but for now this will suffice for
-the introductory example.
+Next we open the database:
+<<dbopen, keep.source=TRUE>>=
+# open a database, call it myDB.db
+ret <- db_open(dbh, txnid=NULL, file="myDB.db", type="BTREE", flags=mkFlags(DB_CREATE, DB_EXCL))
+db_strerror(ret)
+@
 
-One interesting RBerkeley function is {\tt mkFlags}; this provides
+{\tt db\_open} opens the underlying database.  Once again,
+different parameters may be passed in, and some of these will
+be covered in later documentation, but for now this will suffice for
+the introductory example. A definitive treatment should always
+be referenced from the main DB documentation.
+
+The {\tt txnid} is the transaction handle (a DB\_TXN handle in the
+official API).  This may be specified as NULL if no transaction
+capability is needed.  At present no transaction capabilities exist
+in RBerkeley, so this needs to be set as NULL.
+
+The file argument is simply the name of the database we wish to open. The type can
+be one of any supported DB access methods.  These include BTREE, HASH, RECNO,
+QUEUE or UNKNOWN, the latter for opening a database that you don't know the
+type of.  The {\tt db\_open} function will accept a variety of variations
+on these names, see that function for details.
+
+Our flags argument says to create the database file if one is not present,
+(DB\_CREATE), but if and only if one is not present. (DB\_EXCL). The flags
+are central ot many of the advanced features in DB, it is imperative to
+understand what you can and can't specify.  Once again, the main
+program documentation should be the guide.
+
+One interesting non-API function found in RBerkeley is {\tt mkFlags}; this provides
 access to the internal constants defined by DB for use as flag
-parameters to be passed to many of the internal functions. The C
-API allows for flags to be constructed via bitwise OR operations
+parameters to be passed to many of the internal functions. 
+
+The C API allows for flags to be constructed via bitwise OR operations
 on predefined DB constants.  In order to not map all constants into R, which
 would be tedious, error-prone, and difficult to maintain, the
 RBerkeley package passes a list of quoted or unquoted names from mkFlags
-into C code that performs this bitwise operation for us. mkFlags thus
+into C code which in turn performs this bitwise operation for us. mkFlags thus
 allows for syntax very close in look and feel to the base C API, and at
 the same time makes for a robust and safe mechanism to pass 
 arbitrary combinations of flags correctly.  A note about this interface is that
@@ -126,20 +149,11 @@ passing into the C level mkFlags function.  If illegal values are passed
 they will simply be ignored in the calculation, and produce a visible warning
 regarding the specific invalid flag or flags.
 
-<<mkFlags>>=
+<<mkFlags, keep.source=TRUE>>=
 mkFlags(DB_CREATE)
 mkFlags(DB_EXCL)
 mkFlags(DB_CREATE,DB_EXCL)
-mkFlags(DB_CREATE,DB_EXCL,DB_EXCL)
-<<mkFlagsWithWarning>>=
-mkFlags(DB_CREATE,DB_WRONG)
-@
-<<mkFlagsWarning, echo=FALSE>>=
-withCallingHandlers( {
-mkFlags(DB_CREATE,DB_WRONG)
-}, warning=function(w){ assign("last.warning", w, env=baseenv())})
-@
-last.warning
+mkFlags(DB_CREATE,DB_EXCL,DB_EXCL) # bitwise OR no change
 @
 
 \end{document}
