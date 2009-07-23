@@ -1,0 +1,79 @@
+%\VignetteIndexEntry{RBerkeley: Getting Started with DB and R}
+\documentclass{article}
+\usepackage{hyperref}
+\hypersetup{colorlinks,%
+            citecolor=black,%
+            linkcolor=blue,%
+            urlcolor=blue,%
+            }
+\title{\bf RBerkeley: Getting Started with DB and R}
+\author{Jeffrey A. Ryan}
+\date{July 23, 2009}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Overview}
+Berkeley DB is an embedded database application distributed
+by Oracle for use in open source and commercial applications.
+
+Widely deployed, Berkeley DB is used behind the scenes in
+many of the most popular applications and services in
+the world.  It is designed to be fast, memory-efficient, and
+fully ACID compliant.  Berkeley DB, also known commonly as DB,
+is shipped with APIs that allow for programatic access to
+its features.  These directly supported language interfaces
+include C, C++, Java and Tcl.  Contributed bindings exists
+in a variety of programming languages, including Perl, Python, and
+Ruby.
+
+RBerkeley adds an \R language binding to this pool of options.
+
+This document is not to extoll the virtues of DB, but rather to
+provide a quick start to using the \R interface.  The general design
+philosophy of RBerkeley will be explained, and some small examples
+of using it in practice will be worked.
+
+At present a large part of the very large API has been incorporated
+into RBerkeley, including support for most database functions, cursors,
+environments and mutexes.  Not yet supported, though in development,
+are transactions, locks, and the rest of the API.
+
+\section{Design Philosophy}
+The RBerkeley interface is designed to be as close
+to the native C API as possible.  Naming conventions are
+maintained, with some simple substitutions to allow for legal
+{\tt R} function names.  Most of the functionality exposed at
+the R level is simply a thin wrapper to an internal call
+to the C wrapper around the C API calls.
+
+Some additional functionality and function calls are
+included to offer a more seamless user experience, as
+well as provide a more direct connection to the syntax of
+the C API, so as the official Oracle documentation can be used
+once a basic syntax conversion is performed.
+
+\section{Getting DB and RBerkeley}
+Berkeley DB is most likely already available on your
+system if you are running a unix or linux variant. The
+location of the library files are system dependant, and
+at present the configure script included with RBerkeley
+tries to identify the correct locations.
+
+\subsection*{Installing DB}
+It is relatively simple to install the newest version
+of DB directly from Oracle by following the instructions
+included in the download from Oracle.  The remainder of this
+section will assume the default location on POSIX systems. You
+may need to alter your configuration files to build RBerkeley.
+
+\subsection*{Installing RBerkeley}
+Installing RBerkeley follows the standard R installation convention
+of:\cr
+
+{\tt R CMD INSTALL RBerkeley\_0.0-1.tar.gz}
+
+Additional details coming...
+\end{document}
