@@ -77,3 +77,27 @@ of:\cr
 
 Additional details coming...
 \end{document}
+
+\section{Database Basics}
+The primary purpose of this document is not to
+show how to use DB, that is
+best understood by reading the official Oracle documentation.
+Our intention is instead to show basic usage patterns,
+from the R environment, using the RBerkeley package interface.
+
+To begin, we will create a new database, add some R objects
+to it and read them back.  This will give the most simplistic
+use case.
+
+Here we create a new database handle, and open our test database.
+<<dbopen, keep.source=TRUE>>=
+# create a database handle for use throughout
+library(RBerkeley)
+dbh <- db_create()
+
+# open a database, call it myDB.db
+db_open(dbh, "myDB.db", flags=mkFlags(DB_CREATE))
+@
+
+\end{document}
+
