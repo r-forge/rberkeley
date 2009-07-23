@@ -75,8 +75,8 @@ of:
 
 {\tt R CMD INSTALL RBerkeley\_0.0-1.tar.gz}
 
-Additional details coming...
-\end{document}
+
+[Additional details coming...]
 
 \section{Database Basics}
 The primary purpose of this document is not to
@@ -94,10 +94,37 @@ Here we create a new database handle, and open our test database.
 # create a database handle for use throughout
 library(RBerkeley)
 dbh <- db_create()
-
+dbh # a DB handle object
+#
 # open a database, call it myDB.db
-db_open(dbh, "myDB.db", flags=mkFlags(DB_CREATE))
+db_open(dbh, txnid=NULL, file="myDB.db", type="BTREE", flags=mkFlags(DB_CREATE, DB_EXCL))
 @
+
+The first line loads the RBerkeley package into R.  From there
+we need to create a handle to open a database.  This can take some
+additional parameters, but we use the defaults here.  The object returned
+is of class {\tt DB}.
+
+{\tt db\_open} actually opens the underlying database.  Once again,
+different flags may be passed in, as well as other parameters that will
+be covered in later documentation, but for now this will suffice for
+the introductory example.
+
+One interesting RBerkeley function is {\tt mkFlags}; this provides
+access to the internal constants defined by DB for use as flag
+parameters to be passed to many of the internal functions. The C
+API allows for flags to be constructed via bitwise OR operations
+on predefined DB constants.  In order to not map all constants into R, which
+would be tedious, error-prone, and difficult to maintain, the
+RBerkeley package passes a list of quoted or unquoted names from mkFlags
+into C code that performs this bitwise operation for us. mkFlags thus
+allows for syntax very close in look and feel to the base C API, and at
+the same time makes for a robust and safe mechanism to pass 
+arbitrary combinations of flags correctly.  A note about this interface is that
+unquoted symbols are converted to character vectors, and in turn to lists for
+passing into the C level mkFlags function.  If illegal values are passed
+they will simply be ignored in the calculation, and produce a visible warning
+regarding the specific invalid flag or flags.
 
 \end{document}
 
