@@ -148,7 +148,7 @@ on these names, see that function for details.
 
 \vspace{3mm}
 \noindent
-The {\tt flags} argument in this example is used to create the underlying database file if one is not present,
+The {\tt \textcolor{red}{flags}} argument in this example is used to create the underlying database file if one is not present,
 ({\bf DB\_CREATE}), but if and only if one is not present. ({\bf DB\_EXCL}). Flags
 are central to many of the advanced features in DB, and it is crucial to
 understand what you can and can't specify.  Once again, the main
@@ -181,7 +181,6 @@ they will simply be ignored in the calculation, and will produce a visible warni
 regarding the specific invalid flag or flags that failed to be processed.
 The return value will be unaffected by improper or duplicate settings.
 
-\section{
 
 \end{document}
 
