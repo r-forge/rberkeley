@@ -118,8 +118,8 @@ be referenced from the main DB documentation.
 The {\tt txnid} is the transaction handle (a DB\_TXN handle in the
 official API).  This may be specified as NULL if no transaction
 capability is needed.  At present no transaction capabilities exist
-in RBerkeley, so this needs to be set as NULL.
-
+in RBerkeley, so this needs to be set to {\tt txnid=NULL}.
+\newline
 The file argument is simply the name of the database we wish to open. The type can
 be one of any supported DB access methods.  These include BTREE, HASH, RECNO,
 QUEUE or UNKNOWN, the latter for opening a database that you don't know the
