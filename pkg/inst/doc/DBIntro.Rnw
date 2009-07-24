@@ -243,7 +243,7 @@ If one wanted to simply store the raw character values, instead of R objects,
 he could convert to a raw vector before passing into db\_put.
 
 <<dbputraw>>=
-db_put(dbh,key=charToRaw("Ross"),charToRaw("Ihaka"))
+db_put(dbh,key=charToRaw("Ross"),data=charToRaw("Ihaka"))
 charToRaw("Ihaka")
 @
 
