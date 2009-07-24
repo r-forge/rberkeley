@@ -76,6 +76,7 @@ of:
 {\tt R CMD INSTALL RBerkeley\_0.0-1.tar.gz}
 
 
+\noindent
 [Additional details coming...]
 
 \section{Database Basics}
@@ -94,45 +95,73 @@ Here we create a new database handle, and open our test database.
 library(RBerkeley)
 @
 
-<<dbopen, keep.source=TRUE>>=
+<<dbopen, keep.source=FALSE>>=
 dbh <- db_create()
-dbh # a DB handle object
+dbh
 @
-First we need to create a handle to open a database.  {\tt db\_create} can take some
+{\tt db\_create} can take some
 additional parameters, but we use the defaults here.  The object returned
 is of class {\tt DB}.
 
 Next we open the database:
-<<dbopen, keep.source=TRUE>>=
-# open a database, call it myDB.db
+<<dbopen, keep.source=FALSE>>=
 ret <- db_open(dbh, txnid=NULL, file="myDB.db", type="BTREE", flags=mkFlags(DB_CREATE, DB_EXCL))
 db_strerror(ret)
 @
 
-{\tt db\_open} opens the underlying database.  Once again,
-different parameters may be passed in, and some of these will
-be covered in later documentation, but for now this will suffice for
-the introductory example. A definitive treatment should always
-be referenced from the main DB documentation.
+The {\tt db\_open} call opens the underlying database. As with db\_create,
+different parameters may be passed in. Some of these options will
+be covered in later documentation, but for now the defaults are sufficient.
+Users are directed to the official API for usage details.
 
-The {\tt txnid} is the transaction handle (a DB\_TXN handle in the
+\vspace{3mm}
+\noindent
+The return value from the {\tt db\_open} call is an integer value.
+This is the behavior of the underlying API. The utility function
+{\tt db\_strerror} can take this value and return a message to
+R.  Additional error and message tools are available in the API, though
+currently disabled.
+
+\vspace{3mm}
+\noindent
+\subsection*{dbh}
+The {\tt dbh} argument is the database handle (a {\bf DB} struct in the
+official API).  This is from the previous {\tt db\_create} call.
+
+\vspace{3mm}
+\noindent
+\subsection*{txnid}
+The {\tt txnid} is the transaction handle (a {\bf DB\_TXN} struct in the
 official API).  This may be specified as NULL if no transaction
-capability is needed.  At present no transaction capabilities exist
-in RBerkeley, so this needs to be set to {\tt txnid=NULL}.
-\newline
-The file argument is simply the name of the database we wish to open. The type can
+capability is needed, and in the current version of RBerkeley transaction
+support is disabled, so this needs to be passed as {\tt txnid=NULL}.
+
+\vspace{3mm}
+\noindent
+\subsection*{file}
+The {\tt file} argument is simply the name of the database we wish to open. 
+
+\vspace{3mm}
+\noindent
+\subsection*{type}
+The {\tt type} can
 be one of any supported DB access methods.  These include BTREE, HASH, RECNO,
-QUEUE or UNKNOWN, the latter for opening a database that you don't know the
-type of.  The {\tt db\_open} function will accept a variety of variations
+QUEUE or UNKNOWN, the latter for opening a database of unknown type.
+The {\tt db\_open} function will accept a variety of variations
 on these names, see that function for details.
 
-Our flags argument says to create the database file if one is not present,
-(DB\_CREATE), but if and only if one is not present. (DB\_EXCL). The flags
-are central ot many of the advanced features in DB, it is imperative to
+\vspace{3mm}
+\noindent
+\subsection*{flags}
+The {\tt flags} argument in this example is used to create the underlying database file if one is not present,
+({\bf DB\_CREATE}), but if and only if one is not present. ({\bf DB\_EXCL}). Flags
+are central to many of the advanced features in DB, and it is crucial to
 understand what you can and can't specify.  Once again, the main
-program documentation should be the guide.
+API documentation should be the considered the definitive guide.
 
-One interesting non-API function found in RBerkeley is {\tt mkFlags}; this provides
+
+\subsection*{mkFlags}
+One interesting non-API function found in RBerkeley is {\tt mkFlags}; this function provides
 access to the internal constants defined by DB for use as flag
 parameters to be passed to many of the internal functions. 
 
@@ -140,14 +169,10 @@ The C API allows for flags to be constructed via bitwise OR operations
 on predefined DB constants.  In order to not map all constants into R, which
 would be tedious, error-prone, and difficult to maintain, the
 RBerkeley package passes a list of quoted or unquoted names from mkFlags
-into C code which in turn performs this bitwise operation for us. mkFlags thus
+into C code which in turn performs this bitwise operation.  {\tt mkFlags} thus
 allows for syntax very close in look and feel to the base C API, and at
 the same time makes for a robust and safe mechanism to pass 
-arbitrary combinations of flags correctly.  A note about this interface is that
-unquoted symbols are converted to character vectors, and in turn to lists for
-passing into the C level mkFlags function.  If illegal values are passed
-they will simply be ignored in the calculation, and produce a visible warning
-regarding the specific invalid flag or flags.
+arbitrary combinations of flags correctly.  
 
 <<mkFlags, keep.source=TRUE>>=
 mkFlags(DB_CREATE)
@@ -155,6 +180,15 @@ mkFlags(DB_EXCL)
 mkFlags(DB_CREATE,DB_EXCL)
 mkFlags(DB_CREATE,DB_EXCL,DB_EXCL) # bitwise OR no change
 @
+
+A programming note about this interface is that
+unquoted symbols are converted to character vectors, and in turn concatenated into one
+vector that is passed into the C level mkFlags function.  If illegal values are passed
+they will simply be ignored in the calculation, and will produce a visible warning
+regarding the specific invalid flag or flags that failed to be processed.
+The return value will be unaffected by improper or duplicate settings.
+
+\section{
 
 \end{document}
 
