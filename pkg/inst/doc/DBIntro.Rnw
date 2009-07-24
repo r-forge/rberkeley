@@ -191,24 +191,58 @@ records can be organized with a variety of access schemes, all of which are
 discussed at length in the official documentation.
 
 The central difference between records in DB and records in a typical
-relational database is that DB have no notion of type.  Records, both
+relational database is that DB has no notion of type.  Records, both
 key and data are simply byte-strings.  This provides tremendous flexibility
 to the programmer, as it enables data to be stored in the most
 natural format possible, or in a manner that is most in accordance with
 expected usage patterns.
 
 Byte-strings make it quite easy to store native R objects as \emph{key} or
-\emph{data} making additional processing unecessary.  Of course this also
-allows for a preprocessing model to match any arbitrary schema that is chosen.
+\emph{data}, making additional processing unecessary.  Of course this also
+leaves open the possibility of
+creating a preprocessing model to match any arbitrary schema that is needed
+by the final application.
 
 The primary difference in the RBerkeley implementation of the DB API
 is that most R objects are passed to R's {\tt serialize} before being
-sent to the database.  The only exception is for the object type {\tt raw}
-which is passed as is.  This convention allows for maximal ease of use
-from within R, but offers the benefit of providing a direct interface
-to the underlying flexibility of DB.  All DB data must be
+sent to the database. At the DB level, the API simply takes whatever
+raw data is passed in without effort to process.
+The only exception is for the R object type {\tt raw}
+which is passed in {\emph as is}.  This convention allows for simplicity of use
+from within R, yet offers the benefit of providing a direct interface
+to the underlying flexibility of DB if the application/programmer
+demands it.  All DB data must be be serialized, so this conversion from
+R objects (always represented as type RAW internally by RBerkeley) to bytes 
+is carried out in the package's C layer.
 
-\subsubsection{DB->put aka db\_put}
+To add a record, the package and API support two primary functions:
+{\tt db\_put} and {\tt dbcursor\_put}.  These correspond to the official
+API functions {\tt DB->put} and {\tt DBcursor->put}, respectively.  We'll
+take a look at each individually, as well as introduce the concept of the
+DB cursor.
+
+\subsubsection{db\_put \emph{aka} DB->put}
+The most basic way to add data into a database is with {\tt db\_put}.
+This takes a handful of arguments and adds a new record into the database,
+and returns as is usual for most of the API, an integer value of the success
+or failure.
+
+An example or two is the best way to understand how to use.
+
+<<dbput>>=
+db_put(dbh, "Ross", "Ihaka")
+db_put(dbh, "Robert", "Gentleman")
+@
+
+This takes the two R character vectors, and adds them as a key and data into
+our database referenced by the {\tt dbh} handle we created earlier.
+
+Internally you'll note that it is the actual object being stored, after
+being run through {\tt serialize}, and not the characters themselves.
+If one wanted to simply store the raw character values, instead of R objects,
+he could convert to a raw vector before passing into db\_put.
+
+
 \subsubsection{Cursors}
 
 \subsection{Retrieving Records}
