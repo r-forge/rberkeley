@@ -90,9 +90,11 @@ To begin, we will create a new database, add some R objects
 to it and read them back.  This will give the most simplistic
 use case.
 
+\subsection{Opening a Database}
 Here we create a new database handle, and open our test database.
 <<loadRBerkeley, echo=FALSE>>=
 library(RBerkeley)
+system("rm myDB.db")
 @
 
 <<dbopen, keep.source=FALSE>>=
@@ -150,7 +152,7 @@ on these names, see that function for details.
 \noindent
 The {\tt \textcolor{blue}{flags}} argument in this example is used to
 create the underlying database file if needed, i.e. if one is not present,
-[{\bf DB\_CREATE}], but {\emph if and only if} one is not present [{\bf DB\_EXCL}]. Flags
+[{\bf DB\_CREATE}], but \emph{if and only if} one is not present [{\bf DB\_EXCL}]. Flags
 are central to many of the advanced features in DB, and it is crucial to
 understand what you can and can't specify.  Once again, the main
 API documentation should be the considered the definitive guide.
@@ -182,6 +184,37 @@ they will simply be ignored in the calculation, and will produce a visible warni
 regarding the specific invalid flag or flags that failed to be processed.
 The return value will be unaffected by improper or duplicate settings.
 
+\subsection{Adding Records}
+A database needs to have content, if it is to be of use.
+Berkeley DB stores records in databases as simple key-value pairs.  These
+records can be organized with a variety of access schemes, all of which are
+discussed at length in the official documentation.
+
+The central difference between records in DB and records in a typical
+relational database is that DB have no notion of type.  Records, both
+key and data are simply byte-strings.  This provides tremendous flexibility
+to the programmer, as it enables data to be stored in the most
+natural format possible, or in a manner that is most in accordance with
+expected usage patterns.
+
+Byte-strings make it quite easy to store native R objects as \emph{key} or
+\emph{data} making additional processing unecessary.  Of course this also
+allows for a preprocessing model to match any arbitrary schema that is chosen.
+
+The primary difference in the RBerkeley implementation of the DB API
+is that most R objects are passed to R's {\tt serialize} before being
+sent to the database.  The only exception is for the object type {\tt raw}
+which is passed as is.  This convention allows for maximal ease of use
+from within R, but offers the benefit of providing a direct interface
+to the underlying flexibility of DB.  All DB data must be
+
+\subsubsection{DB->put aka db\_put}
+\subsubsection{Cursors}
+
+\subsection{Retrieving Records}
+
+\subsubsection{DB->get aka db\_get}
+\subsubsection{Cursors}
 
 \end{document}
 
