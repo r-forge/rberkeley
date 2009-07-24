@@ -253,11 +253,12 @@ A cursor in database terminology is really nothing more than a pointer
 to a record.  A cursor can traverse a database, and provides a host
 of retrieval options that simply using {\tt db\_put} would be impossible for.
 
-Using cursors, or even explaining much beyond this is outside the scope
-of this document, but the above description should be sufficient to understand
-what is happening internally.
+Using cursors or even explaining much beyond the above is outside the scope
+of this document. The preceeding description should be sufficient to 
+have a cursory understanding
+what is happening internally. Yes, cursory.
 
-To add a record with a cursor, we first need a cursor handle to our
+To add a record with a cursor, we first need a valid cursor handle to our
 database.  This is accomplished with a call to {\tt db\_cursor} using
 a valid {\tt dbh} handle to an open database.
 
@@ -266,14 +267,18 @@ dbc <- db_cursor(dbh)
 @
 
 As with most API calls, there are numerous argument that may be passed into
-the creation call.  From here the cursor (mapping to the C API struct {\bf DBC})
-is ready for use.
+the creation call.  The cursor (mapping to the C API struct {\bf DBC})
+is now ready for use.
 
-To put a record in the database, we simply use the appropriate {\emph cursor} method:
+To put a record in the database, we now use the appropriate {\emph cursor} method:
 
 <<dbcursorput>>=
-dbcursor_put(dbc, key=100L, value=5L, flags=mkFlags(DB_KEYLAST))
+dbcursor_put(dbc, key=100L, data=5L, flags=mkFlags(DB_KEYLAST))
 @
+
+Again, the return value of 0 is an indicator of success.
+
+Some important points regarding the flags allowed. 
 
 \subsection{Retrieving Records}
 
