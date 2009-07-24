@@ -134,8 +134,10 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
   memset(&key, 0, sizeof(DBT));
   memset(&data, 0, sizeof(DBT));
 
-  SEXP results;
-  PROTECT(results = allocVector(VECSXP, n)); P++;
+  SEXP Keys, Data, results;
+  PROTECT(Keys = allocVector(VECSXP, n)); P++;
+  PROTECT(Data = allocVector(VECSXP, n)); P++;
+  PROTECT(results = allocVector(VECSXP, 2)); P++;
   
   /*
     Three scenarios for DBcursor->get calls:
@@ -156,11 +158,22 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
 
     ret = dbc->get(dbc, &key, &data, flags);
     if(ret == 0) {
+      SEXP rawkey;
+      PROTECT(rawkey = allocVector(RAWSXP, key.size));
+      memcpy(RAW(rawkey), key.data, key.size);
+      SET_VECTOR_ELT(Keys, 0, rawkey);
+      UNPROTECT(1);
+      PROTECT(Keys = lengthgets(Keys, 1)); P++;
+
       SEXP rawdata;
       PROTECT(rawdata = allocVector(RAWSXP, data.size));
       memcpy(RAW(rawdata), data.data, data.size);
+      SET_VECTOR_ELT(Data, 0, rawdata);
       UNPROTECT(1);
-      SET_VECTOR_ELT(results, 0, rawdata);
+      PROTECT(Data = lengthgets(Data, 1)); P++;
+      
+      SET_VECTOR_ELT(results, 0, Keys);
+      SET_VECTOR_ELT(results, 1, Data);
     }
   } else
   if( !isNull(_key) ) {
@@ -170,35 +183,60 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
 
     ret = dbc->get(dbc, &key, &data, flags);
     if(ret == 0) {
+      SEXP rawkey;
+      PROTECT(rawkey = allocVector(RAWSXP, key.size));
+      memcpy(RAW(rawkey), key.data, key.size);
+      SET_VECTOR_ELT(Keys, 0, rawkey);
+      UNPROTECT(1);
+      PROTECT(Keys = lengthgets(Keys, 1)); P++;
+
       SEXP rawdata;
       PROTECT(rawdata = allocVector(RAWSXP, data.size));
       memcpy(RAW(rawdata), data.data, data.size);
+      SET_VECTOR_ELT(Data, 0, rawdata);
       UNPROTECT(1);
-      SET_VECTOR_ELT(results, 0, rawdata);
-      PROTECT(results = lengthgets(results, 1)); P++;
-    }
-  } 
+      PROTECT(Data = lengthgets(Data, 1)); P++;
 
+      SET_VECTOR_ELT(results, 0, Keys);
+      SET_VECTOR_ELT(results, 1, Data);
+    }
+  } else 
   if(isNull(_key) && isNull(_data)) {
+Rprintf("both null, n=%i\n", n);
     for(i = 0; i < n; i++) {
       ret = dbc->get(dbc, &key, &data, flags);
       if(ret == 0) {
+        SEXP rawkey;
+        PROTECT(rawkey = allocVector(RAWSXP, key.size));
+        memcpy(RAW(rawkey), key.data, key.size);
+        SET_VECTOR_ELT(Keys, i, rawkey);
+        UNPROTECT(1);
         SEXP rawdata;
         PROTECT(rawdata = allocVector(RAWSXP, data.size));
         memcpy(RAW(rawdata), data.data, data.size);
+        SET_VECTOR_ELT(Data, i, rawdata);
         UNPROTECT(1);
-        SET_VECTOR_ELT(results, i, rawdata);
       } else {
         if(i == 0) {
+          /* no results */
           UNPROTECT(P);
           return ScalarInteger(ret);
         }
-        PROTECT(results = lengthgets(results, i-1)); P++;
+        /* truncate the keys and data to the i-size found */
+        PROTECT(Keys = lengthgets(Keys, i)); P++;
+        PROTECT(Data = lengthgets(Data, i)); P++;
         break;
       }
     }
+    SET_VECTOR_ELT(results, 0, Keys);
+    SET_VECTOR_ELT(results, 1, Data);
   }
 
+  SEXP resultnames;
+  PROTECT(resultnames = allocVector(STRSXP,2)); P++;
+  SET_STRING_ELT(resultnames, 0, mkChar("key"));
+  SET_STRING_ELT(resultnames, 1, mkChar("data"));
+  setAttrib(results, R_NamesSymbol, resultnames);
   UNPROTECT(P);
   return results;
 }
