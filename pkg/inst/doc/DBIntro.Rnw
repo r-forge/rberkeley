@@ -248,6 +248,32 @@ charToRaw("Ihaka")
 @
 
 \subsubsection{Cursors}
+A second slightly more abstract way of adding keys is to use a cursor.
+A cursor in database terminology is really nothing more than a pointer
+to a record.  A cursor can traverse a database, and provides a host
+of retrieval options that simply using {\tt db\_put} would be impossible for.
+
+Using cursors, or even explaining much beyond this is outside the scope
+of this document, but the above description should be sufficient to understand
+what is happening internally.
+
+To add a record with a cursor, we first need a cursor handle to our
+database.  This is accomplished with a call to {\tt db\_cursor} using
+a valid {\tt dbh} handle to an open database.
+
+<<dbcursor>>=
+dbc <- db_cursor(dbh)
+@
+
+As with most API calls, there are numerous argument that may be passed into
+the creation call.  From here the cursor (mapping to the C API struct {\bf DBC})
+is ready for use.
+
+To put a record in the database, we simply use the appropriate {\emph cursor} method:
+
+<<dbcursorput>>=
+dbcursor_put(dbc, key=100L, value=5L, flags=mkFlags(DB_KEYLAST))
+@
 
 \subsection{Retrieving Records}
 
