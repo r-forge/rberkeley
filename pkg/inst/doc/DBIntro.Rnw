@@ -230,18 +230,22 @@ or failure.
 An example or two is the best way to understand how to use.
 
 <<dbput>>=
-db_put(dbh, "Ross", "Ihaka")
-db_put(dbh, "Robert", "Gentleman")
+db_put(dbh, key="Ross", data="Ihaka")
+db_put(dbh, key="Robert", data="Gentleman")
 @
 
 This takes the two R character vectors, and adds them as a key and data into
 our database referenced by the {\tt dbh} handle we created earlier.
 
-Internally you'll note that it is the actual object being stored, after
+Internally it should be noted that it is the actual object being stored, after
 being run through {\tt serialize}, and not the characters themselves.
 If one wanted to simply store the raw character values, instead of R objects,
 he could convert to a raw vector before passing into db\_put.
 
+<<dbputraw>>=
+db_put(dbh,key=charToRaw("Ross"),charToRaw("Ihaka"))
+charToRaw("Ihaka")
+@
 
 \subsubsection{Cursors}
 
