@@ -124,23 +124,23 @@ currently disabled.
 
 \vspace{3mm}
 \noindent
-The {\tt dbh} argument is the database handle (a {\bf DB} struct in the
+The {\tt \textcolor{blue}{dbh}} argument is the database handle (a {\bf DB} struct in the
 official API).  This is from the previous {\tt db\_create} call.
 
 \vspace{3mm}
 \noindent
-The {\tt txnid} is the transaction handle (a {\bf DB\_TXN} struct in the
+The {\tt \textcolor{blue}{txnid}} is the transaction handle (a {\bf DB\_TXN} struct in the
 official API).  This may be specified as NULL if no transaction
 capability is needed, and in the current version of RBerkeley transaction
 support is disabled, so this needs to be passed as {\tt txnid=NULL}.
 
 \vspace{3mm}
 \noindent
-The {\tt file} argument is simply the name of the database we wish to open. 
+The {\tt \textcolor{blue}{file}} argument is simply the name of the database we wish to open. 
 
 \vspace{3mm}
 \noindent
-The {\tt type} can
+The {\tt \textcolor{blue}{type}} can
 be one of any supported DB access methods.  These include BTREE, HASH, RECNO,
 QUEUE or UNKNOWN, the latter for opening a database of unknown type.
 The {\tt db\_open} function will accept a variety of variations
@@ -148,8 +148,9 @@ on these names, see that function for details.
 
 \vspace{3mm}
 \noindent
-The {\tt \textcolor{red}{flags}} argument in this example is used to create the underlying database file if one is not present,
-({\bf DB\_CREATE}), but if and only if one is not present. ({\bf DB\_EXCL}). Flags
+The {\tt \textcolor{blue}{flags}} argument in this example is used to
+create the underlying database file if needed, i.e. if one is not present,
+[{\bf DB\_CREATE}], but {\emph if and only if} one is not present [{\bf DB\_EXCL}]. Flags
 are central to many of the advanced features in DB, and it is crucial to
 understand what you can and can't specify.  Once again, the main
 API documentation should be the considered the definitive guide.
@@ -171,11 +172,11 @@ arbitrary combinations of flags correctly.
 mkFlags(DB_CREATE)
 mkFlags(DB_EXCL)
 mkFlags(DB_CREATE,DB_EXCL)
-mkFlags(DB_CREATE,DB_EXCL,DB_EXCL) # bitwise OR no change
+mkFlags(DB_CREATE,DB_EXCL,DB_EXCL) # bitwise OR duplicates: no change
 @
 
-A programming note about this interface is that
-unquoted symbols are converted to character vectors, and in turn concatenated into one
+A programming note about this interface:
+unquoted symbols are converted to character vectors and in turn concatenated into one
 vector that is passed into the C level mkFlags function.  If illegal values are passed
 they will simply be ignored in the calculation, and will produce a visible warning
 regarding the specific invalid flag or flags that failed to be processed.
