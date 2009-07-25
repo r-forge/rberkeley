@@ -150,7 +150,9 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
   */
   if( !isNull(_key) &&
       !isNull(_data)  ) {
-
+    /* need to handle cases where multiple results
+       can be returned. Possibly given that flag
+       we can instead use the last if-else branch */
     key.data = (unsigned char *)RAW(_key);
     key.size = length(_key);
     data.data = (unsigned char *)RAW(_data);
@@ -158,22 +160,35 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
 
     ret = dbc->get(dbc, &key, &data, flags);
     if(ret == 0) {
+      SEXP KeyData;
+      PROTECT(KeyData = allocVector(VECSXP, 2));P++;
+
       SEXP rawkey;
       PROTECT(rawkey = allocVector(RAWSXP, key.size));
       memcpy(RAW(rawkey), key.data, key.size);
-      SET_VECTOR_ELT(Keys, 0, rawkey);
+      SET_VECTOR_ELT(KeyData, 0, rawkey);
       UNPROTECT(1);
-      PROTECT(Keys = lengthgets(Keys, 1)); P++;
+      //PROTECT(Keys = lengthgets(Keys, 1)); P++;
 
       SEXP rawdata;
       PROTECT(rawdata = allocVector(RAWSXP, data.size));
       memcpy(RAW(rawdata), data.data, data.size);
-      SET_VECTOR_ELT(Data, 0, rawdata);
+      SET_VECTOR_ELT(KeyData, 1, rawdata);
       UNPROTECT(1);
-      PROTECT(Data = lengthgets(Data, 1)); P++;
+      //PROTECT(Data = lengthgets(Data, 1)); P++;
       
-      SET_VECTOR_ELT(results, 0, Keys);
-      SET_VECTOR_ELT(results, 1, Data);
+      //SET_VECTOR_ELT(KeyData, 0, Keys);
+      //SET_VECTOR_ELT(KeyData, 1, Data);
+SEXP KeyDataNames;
+PROTECT(KeyDataNames = allocVector(STRSXP,2)); P++;
+SET_STRING_ELT(KeyDataNames, 0, mkChar("key"));
+SET_STRING_ELT(KeyDataNames, 1, mkChar("data"));
+setAttrib(KeyData, R_NamesSymbol, KeyDataNames);
+      SET_VECTOR_ELT(results, 0, KeyData);
+      /*SET_VECTOR_ELT(results, 0, Keys);*/
+      /*SET_VECTOR_ELT(results, 1, Data);*/
+PROTECT(results = lengthgets(results, 1)); P++;
+UNPROTECT(P); return results;
     }
   } else
   if( !isNull(_key) ) {
@@ -232,6 +247,8 @@ Rprintf("both null, n=%i\n", n);
     SET_VECTOR_ELT(results, 1, Data);
   }
 
+  /* FIXME to return a list of lists; each with 2 entries, key & data
+     this is the first _one_ result case at the top... */
   SEXP resultnames;
   PROTECT(resultnames = allocVector(STRSXP,2)); P++;
   SET_STRING_ELT(resultnames, 0, mkChar("key"));
