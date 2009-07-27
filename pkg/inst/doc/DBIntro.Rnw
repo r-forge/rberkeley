@@ -343,9 +343,41 @@ is no {\tt txnid} argument to cursor \emph{get} calls.
 A few example to illustrate some behavior: 
 
 <<dbcursorget-1>>=
-dbcursor_get(dbc, n=1)
+res <- dbcursor_get(dbc, n=1)
+res
+@
+
+This retrieves the current value at the current cursor position.
+One notable difference with cursor calls versus standard {\tt db\_get}
+is that a list of key/data results are returned. Each element
+of the list is a list containing an element named `key' with the value
+of the key, and an element names `data' with the value of the data.
+Multiple elements would produce a list of length \emph{n}, where
+\emph{n} would be the lesser of the `n' value specified, or the number
+of records returned by the query.
+
+Another item of note is that the returned values contained as
+elements of the list are still in {\tt RAW} form.  Unserializing
+or otherwise converting into R objects would be the final step
+in most applications.
+
+<<resunserialize>>=
+lapply(res[[1]], unserialize)
+@
+
+It is also to find a specific record by using the DB\_SET flag
+and specifying a key. This is similar to the traditional
+{\tt db\_get} results, though with the key returned as well.
+
+<<dbcursorget-2>>=
 dbcursor_get(dbc, key="Ross", flags=mkFlags("DB_SET"))
+@
+
+<<dbcursorget-3>>=
 dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_SET"))
+@
+
+<<dbcursorget-4>>=
 dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_GET_BOTH"))
 @
 
