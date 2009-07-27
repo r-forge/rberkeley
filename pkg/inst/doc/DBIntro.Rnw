@@ -405,5 +405,30 @@ res <- dbcursor_get(dbc, flags=mkFlags("DB_NEXT"), n=100)
 res
 @
 
+Given the output returns, and with knowledge of the data contained, we
+can use the R language to easily find the keys in our database. We'll exclude
+the first record, as we didn't use serialize in that entry. Just like
+any storage, knowledge of your data is critical to proper processing.
+
+<<dbkeys>>=
+sapply(res[-1], function(x) unserialize(x$key))
+@
+
+\subsection{Removing Records}
+Sometimes it may be necessary to remove records from the database. As with
+\emph{put} and \emph{get} functionality, we can delete records
+using standard {\bf DB} methods or use cursors.  A few example on how this is done;
+
+\subsubsection{db\_del \emph{aka} DB->del}
+The basic DB method removes all records (duplicates included) matching
+the {\tt key} argument.  The function is quite
+straightforward. The {\tt flags} argument, currently unused, must be set to zero
+or remain unspecified. The function returns the standard DB error values
+as integers.
+
+<<dbdel>>=
+db_del(dbh, key=charToRaw("Ross"))
+@
+
 \end{document}
 
