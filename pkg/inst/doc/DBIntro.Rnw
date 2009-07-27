@@ -448,7 +448,19 @@ Then call the cursor delete function.
 <<dbcursordel>>=
 firstrecord <- dbcursor_get(dbc, flags=mkFlags("DB_FIRST"))[[1]]
 db_strerror(dbcursor_del(dbc))
-dbcursor_get(dbc, key=firstrecord$key, flags=mkFlags("DB_SET"))
+ret <- dbcursor_get(dbc, key=firstrecord$key, flags=mkFlags("DB_SET"))
+db_strerror(ret)
 @
+
+\section{Conclusion}
+RBerkeley provides low-level API access to the Berkeley DB 
+embedded database library. While this document merely touched on
+basic usage, a full suite of API functionality is available
+to the R user via the 70+ functions currently shipped
+with the RBerkeley package.
+
+Testing, documentation, and further methods will be added in
+upcoming RBerkeley version.
+
 \end{document}
 
