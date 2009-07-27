@@ -7,6 +7,13 @@ db_strerror <- function(error)
   .Call("rberkeley_db_strerror", as.integer(error))
 } 
 
+db_del <- function(dbh, txnid=NULL, key, flags=0L)
+{
+  if(!is.raw(key))
+    key <- serialize(key, NULL)
+  .Call("rberkeley_db_del", dbh, txnid, key, flags)
+}
+
 db_open <- function(dbh, txnid=NULL, file="access.db",
                     database=NULL, type="BTREE", flags=0L) {
   if(!is.numeric(type)) {

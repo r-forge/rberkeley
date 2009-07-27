@@ -30,6 +30,7 @@ export(
         db_sync,
 
         db_exists,
+        db_del,
         db_put,
         db_get,
         db_key_range,
