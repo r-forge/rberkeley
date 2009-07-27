@@ -365,7 +365,7 @@ in most applications.
 lapply(res[[1]], unserialize)
 @
 
-It is also to find a specific record by using the DB\_SET flag
+It is also possible to find a specific record by using the DB\_SET flag
 and specifying a key. This is similar to the traditional
 {\tt db\_get} results, though with the key returned as well.
 
@@ -373,10 +373,22 @@ and specifying a key. This is similar to the traditional
 dbcursor_get(dbc, key="Ross", flags=mkFlags("DB_SET"))
 @
 
+The {\tt data} argument to the {\tt dbcursor\_get} function
+may be used to further specify a query. The main Oracle
+documentation should be referenced here, but a few examples will
+once again be illustrative.
+
 <<dbcursorget-3>>=
-dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_SET"))
+res <- dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_SET"))
+lapply(res[[1]], unserialize)
 @
 
+The above call, as you will note, returns something other than the data we
+were requesting. This is a result of the {\tt flags} argument
+being set to \emph{DB\_SET}. DB simply returns key/data for the first element
+to match the key.
+
+To prevent this behavior, set {\tt flags=mkFlags("DB\_GET\_BOTH")}.
 <<dbcursorget-4>>=
 dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_GET_BOTH"))
 @
