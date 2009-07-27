@@ -379,7 +379,7 @@ documentation should be referenced here, but a few examples will
 once again be illustrative.
 
 <<dbcursorget-3>>=
-res <- dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_SET"))
+res <- dbcursor_get(dbc, key="Ross", data="Brawn", flags=mkFlags("DB_SET"))
 lapply(res[[1]], unserialize)
 @
 
@@ -391,6 +391,17 @@ to match the key.
 To prevent this behavior, set {\tt flags=mkFlags("DB\_GET\_BOTH")}.
 <<dbcursorget-4>>=
 dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_GET_BOTH"))
+@
+
+Cursors can also be useful for iterating over a database's key/data
+records.  To iterate over the entire database, it is necessary to have
+a new (uninitialized) cursor.  Closing and re-opening the original
+cursor object would be just as good as creating a new one in most cases.
+
+<<dbcursornew>>=
+dbcursor_close(dbc)
+dbc <- db_cursor(dbh)
+dbcursor_get(dbc, flags=mkFlags("DB_NEXT"))
 @
 
 \end{document}
