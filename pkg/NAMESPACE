@@ -93,7 +93,13 @@ export(
 
         ### Memory Pools ###
         db_get_mpf,
-        dbenv_memp_stat_print
+        dbenv_memp_stat_print,
+
+        ### Transactions ###
+        dbenv_txn_stat_print,
+        dbenv_txn_begin,
+        dbtxn_abort,
+        dbtxn_id
       )
 
 S3method(print, DB)
