@@ -443,9 +443,12 @@ argument must be set to zero, per the DB API.
 
 To delete the first record in the database, position the cursor
 using {\tt dbcursor\_get} with the flags argument set to ``DB\_FIRST''.
+Then call the cursor delete function.
 
 <<dbcursordel>>=
-dbcursor_get(dbc, flags=mkFlags("DB_FIRST"))
+firstrecord <- dbcursor_get(dbc, flags=mkFlags("DB_FIRST"))[[1]]
+db_strerror(dbcursor_del(dbc))
+dbcursor_get(dbc, key=firstrecord$key, flags=mkFlags("DB_SET"))
 @
 \end{document}
 
