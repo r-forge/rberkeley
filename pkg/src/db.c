@@ -1066,7 +1066,22 @@ SEXP rberkeley_db_get_pagesize (SEXP _dbp)
 /*** BTree/Recno Configuration ***/    
 /* rberkeley_db_set_append_recno */
 /* rberkeley_db_set_bt_compare */
-/* rberkeley_db_set_bt_minkey */
+/* {{{ rberkeley_db_set_bt_minkey */
+SEXP rberkeley_db_set_bt_minkey (SEXP _dbp, SEXP _minkey) {
+  DB *dbp;
+  u_int32_t minkey;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+    error("invalid 'db' handle");
+
+  minkey = (u_int32_t)INTEGER(_minkey)[0];
+  ret = dbp->set_bt_minkey(dbp, minkey);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* rberkeley_db_set_bt_prefix */
 /* rberkeley_db_set_re_delim */
 /* rberkeley_db_set_re_len */
@@ -1077,7 +1092,37 @@ SEXP rberkeley_db_get_pagesize (SEXP _dbp)
 /* rberkeley_db_set_h_compare */
 /* rberkeley_db_set_h_ffactor */
 /* rberkeley_db_set_h_hash */
-/* rberkeley_db_set_h_nelem  */
+/* {{{ rberkeley_db_set_h_nelem  */
+SEXP rberkeley_db_set_h_nelem (SEXP _dbp, SEXP _h_nelem) {
+  DB *dbp;
+  u_int32_t h_nelem;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+    error("invalid 'db' handle");
+
+  h_nelem = (u_int32_t)INTEGER(_h_nelem)[0];
+  ret = dbp->set_h_nelem(dbp, h_nelem);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 
 /*** Queue Configuration ***/
-/* rberkeley_db_set_q_extentsize */
+/* {{{ rberkeley_db_set_q_extentsize */
+SEXP rberkeley_db_set_q_extentsize (SEXP _dbp, SEXP _extentsize) {
+  DB *dbp;
+  u_int32_t extentsize;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+    error("invalid 'db' handle");
+
+  extentsize = (u_int32_t)INTEGER(_extentsize)[0];
+  ret = dbp->set_q_extentsize(dbp, extentsize);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
