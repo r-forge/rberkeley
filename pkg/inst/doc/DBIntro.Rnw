@@ -297,8 +297,51 @@ a open database, and a functioning database handle (internally
 a pointer to a struct {\bf DB}, for those following
 allong with the official documentation).
 
-The get method may 
+Depending on the flags specified to the db\_get function
+it is possible to perform more advanced operations than
+the following examples will cover.  By default, {\tt flags=0L}
+for all calls not specifying a flag argument.
+
+In the present version of RBerkeley, transaction support is
+disabled, and must be set to NULL. If not specified, this is the
+default.
+
+<<dbget1>>=
+db_get(dbh, key=100L)
+@
+
+As only raw values are stored by DB and RBerkeley, it is
+up to the calling code to interpret the resultant output.
+By default, the original \emph{put} calls serialize
+the R objects.  There is no default behavior for \emph{get}.
+If the object was serialized with R's {\tt serialize} function (the default)
+simply wrapping {\tt db\_get} with {\tt unserialize} will return the
+original object.
+
+<<dbget2>>=
+unserialize(db_get(dbh, key=100L))
+@
+
+Only the data value associated with the given key is returned.
+To access data that is stored under duplicate (identical) keys, or perform
+more advanced query operations including partial matching, it is
+necessary to use cursors.
+
 \subsubsection{Cursors}
+Cursor \emph{get} functions are similar to the simpler
+database get functions, in that a data value is
+returned for a given key.
+
+Cursors can be far more flexible if need be. For instance, it is possible
+to iterate over all key/data pairs in a given database, simply
+by passing {\tt NULL} for the key and data arguments.  Flags are
+once again critical to the behavior of the queries.
+
+The transaction support (currently disabled in RBerkeley) is
+set at the instantiation of the cursor, and therefore there
+is no {\tt txnid} argument to cursor \emph{get} calls.
+A few example to illustrate some behavior: 
+
 
 \end{document}
 
