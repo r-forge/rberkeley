@@ -278,11 +278,26 @@ dbcursor_put(dbc, key=100L, data=5L, flags=mkFlags(DB_KEYLAST))
 
 Again, the return value of 0 is an indicator of success.
 
-Some important points regarding the flags allowed. 
+Some important points regarding the flags allowed need to
+be understood.  It is imperative to understand the underlying
+DB functionality before using cursors. 
 
 \subsection{Retrieving Records}
+As with putting records in a database, we can retrieve records
+through two different mechanisms as well. The is the standard
+database retrieval method for DB that is via the DB->get method, 
+available in RBerkeley via {\tt db\_get}.  The second
+method works with cursors, as we had seen before.  As before
+these methods may be used together, or exclusively.
 
 \subsubsection{DB->get aka db\_get}
+The `standard' way to fetch records from a database
+would be with the {\tt db\_get} method.  This only requires
+a open database, and a functioning database handle (internally
+a pointer to a struct {\bf DB}, for those following
+allong with the official documentation).
+
+The get method may 
 \subsubsection{Cursors}
 
 \end{document}
