@@ -140,10 +140,9 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
   PROTECT(results = allocVector(VECSXP, n)); P++;
   
   /*
-    Three scenarios for DBcursor->get calls:
-    (1) key and data are SPECIFIED
-    (2) key is SPECIFIED, data is EMPTY
-    (3) key and data are EMPTY 
+    Two scenarios for DBcursor->get calls:
+    (1) key and data are SPECIFIED <OR> key is SPECIFIED, data is EMPTY
+    (2) key and data are EMPTY 
 
     We must handle these seperately in order
     to return a sensible result
@@ -185,42 +184,7 @@ SEXP rberkeley_dbcursor_get (SEXP _dbc,
       setAttrib(KeyData, R_NamesSymbol, KeyDataNames);
       SET_VECTOR_ELT(results, 0, KeyData);
       PROTECT(results = lengthgets(results, 1)); P++;
-      UNPROTECT(P); return results;
     }
-/*
-  } else
-  if( !isNull(_key) ) {
-
-    key.data = (unsigned char *)RAW(_key);
-    key.size = length(_key);
-
-    ret = dbc->get(dbc, &key, &data, flags);
-    if(ret == 0) {
-      SEXP KeyData;
-      PROTECT(KeyData = allocVector(VECSXP, 2));P++;
-
-      SEXP rawkey;
-      PROTECT(rawkey = allocVector(RAWSXP, key.size));
-      memcpy(RAW(rawkey), key.data, key.size);
-      SET_VECTOR_ELT(KeyData, 0, rawkey);
-      UNPROTECT(1);
-
-      SEXP rawdata;
-      PROTECT(rawdata = allocVector(RAWSXP, data.size));
-      memcpy(RAW(rawdata), data.data, data.size);
-      SET_VECTOR_ELT(KeyData, 1, rawdata);
-      UNPROTECT(1);
-
-      SEXP KeyDataNames;
-      PROTECT(KeyDataNames = allocVector(STRSXP,2)); P++;
-      SET_STRING_ELT(KeyDataNames, 0, mkChar("key"));
-      SET_STRING_ELT(KeyDataNames, 1, mkChar("data"));
-      setAttrib(KeyData, R_NamesSymbol, KeyDataNames);
-      SET_VECTOR_ELT(results, 0, KeyData);
-      PROTECT(results = lengthgets(results, 1)); P++;
-      UNPROTECT(P); return results;
-    }
-*/
   } else 
   if(isNull(_key) && isNull(_data)) {
     for(i = 0; i < n; i++) {
