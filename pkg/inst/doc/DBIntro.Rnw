@@ -426,9 +426,26 @@ straightforward. The {\tt flags} argument, currently unused, must be set to zero
 or remain unspecified. The function returns the standard DB error values
 as integers.
 
+As an example, this will check to see if a key exists before we delete it, delete it, then check
+again.
+
 <<dbdel>>=
+db_strerror(db_exists(dbh, key=charToRaw("Ross")))
 db_del(dbh, key=charToRaw("Ross"))
+db_strerror(db_exists(dbh, key=charToRaw("Ross")))
 @
 
+\subsubsection{Cursors}
+An alternative approach, though a bit less obvious, is to use cursors.
+Cursor deletes will simply delete the record at
+the cursor's current position. There is no key argument, and the flags
+argument must be set to zero, per the DB API.
+
+To delete the first record in the database, position the cursor
+using {\tt dbcursor\_get} with the flags argument set to ``DB\_FIRST''.
+
+<<dbcursordel>>=
+dbcursor_get(dbc, flags=mkFlags("DB_FIRST"))
+@
 \end{document}
 

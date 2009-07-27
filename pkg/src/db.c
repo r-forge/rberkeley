@@ -140,7 +140,7 @@ SEXP rberkeley_db_del(SEXP _dbp, SEXP _txnid, SEXP _key, SEXP _flags)
   if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
     error("invalid 'db' handle");
 
-  if(isNull(_txnid)) {
+  if(!isNull(_txnid)) {
     txnid = R_ExternalPtrAddr(_txnid);
   } else {
     txnid = NULL;
