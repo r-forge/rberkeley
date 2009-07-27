@@ -290,7 +290,7 @@ available in RBerkeley via {\tt db\_get}.  The second
 method works with cursors, as we had seen before.  As before
 these methods may be used together, or exclusively.
 
-\subsubsection{DB->get aka db\_get}
+\subsubsection{db\_get \emph{aka} DB->get}
 The `standard' way to fetch records from a database
 would be with the {\tt db\_get} method.  This only requires
 a open database, and a functioning database handle (internally
@@ -342,6 +342,12 @@ set at the instantiation of the cursor, and therefore there
 is no {\tt txnid} argument to cursor \emph{get} calls.
 A few example to illustrate some behavior: 
 
+<<dbcursorget-1>>=
+dbcursor_get(dbc, n=1)
+dbcursor_get(dbc, key="Ross", flags=mkFlags("DB_SET"))
+dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_SET"))
+dbcursor_get(dbc, key="Ross", data="Braun", flags=mkFlags("DB_GET_BOTH"))
+@
 
 \end{document}
 
