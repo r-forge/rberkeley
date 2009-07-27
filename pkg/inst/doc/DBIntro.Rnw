@@ -401,7 +401,8 @@ cursor object would be just as good as creating a new one in most cases.
 <<dbcursornew>>=
 dbcursor_close(dbc)
 dbc <- db_cursor(dbh)
-dbcursor_get(dbc, flags=mkFlags("DB_NEXT"))
+res <- dbcursor_get(dbc, flags=mkFlags("DB_NEXT"), n=100)
+res
 @
 
 \end{document}
