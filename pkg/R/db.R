@@ -160,6 +160,11 @@ db_get_lorder <- function(dbh)
    return("big.endian")
 }
 
+db_stat <- function(dbh, txnid=NULL, flags=mkFlags("DB_FAST_STAT"))
+{
+  .Call("rberkeley_db_stat", as.DB(dbh), txnid, as.integer(flags)) 
+}
+
 db_stat_print <- function(dbh, flags=0L)
 {
   .Call("rberkeley_db_stat_print", as.DB(dbh), as.integer(flags)) 

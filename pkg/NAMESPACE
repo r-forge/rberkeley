@@ -48,6 +48,7 @@ export(
         db_set_msgfile,
 
         db_get_byteswapped,
+        db_stat,
         db_stat_print,
 
         db_set_encrypt,

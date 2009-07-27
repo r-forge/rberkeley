@@ -573,7 +573,145 @@ SEXP rberkeley_db_get_priority (SEXP _dbp)
   }
 }
 /* }}} */
-/* rberkeley_db_stat */
+/* {{{ rberkeley_db_stat */
+SEXP rberkeley_db_stat (SEXP _dbp, SEXP _txnid, SEXP _flags)
+{
+  DB *dbp;
+  DB_TXN *txnid;
+  DBTYPE type;
+  u_int32_t flags;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+    error("invalid 'db' handle");
+  if(!isNull(_txnid)) {
+    txnid = R_ExternalPtrAddr(_txnid);
+  } else txnid = NULL;
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  dbp->get_type(dbp, &type); /* DBTYPE to know structure returned */
+  
+  SEXP DBstat=NULL, DBstatnames=NULL;
+  DB_HASH_STAT *hash=NULL;
+  DB_BTREE_STAT  *bt=NULL;
+  DB_QUEUE_STAT  *qs=NULL;
+  switch(type) {
+    case DB_HASH:
+      dbp->stat(dbp, txnid, &hash, flags);
+      PROTECT(DBstat = allocVector(VECSXP,16));
+      PROTECT(DBstatnames = allocVector(STRSXP,16));
+      SET_VECTOR_ELT(DBstat,  0, ScalarInteger(hash->hash_magic));
+      SET_STRING_ELT(DBstatnames,  0, mkChar("hash_magic"));
+      SET_VECTOR_ELT(DBstat,  1, ScalarInteger(hash->hash_version));
+      SET_STRING_ELT(DBstatnames,  1, mkChar("hash_version"));
+      SET_VECTOR_ELT(DBstat,  2, ScalarInteger(hash->hash_nkeys));
+      SET_STRING_ELT(DBstatnames,  2, mkChar("hash_nkeys"));
+      SET_VECTOR_ELT(DBstat,  3, ScalarInteger(hash->hash_ndata));
+      SET_STRING_ELT(DBstatnames,  3, mkChar("hash_ndata"));
+      SET_VECTOR_ELT(DBstat,  4, ScalarInteger(hash->hash_pagecnt));
+      SET_STRING_ELT(DBstatnames,  4, mkChar("hash_pagecnt"));
+      SET_VECTOR_ELT(DBstat,  5, ScalarInteger(hash->hash_pagesize));
+      SET_STRING_ELT(DBstatnames,  5, mkChar("hash_pagesize"));
+      SET_VECTOR_ELT(DBstat,  6, ScalarInteger(hash->hash_ffactor));
+      SET_STRING_ELT(DBstatnames,  6, mkChar("hash_ffactor"));
+      SET_VECTOR_ELT(DBstat,  7, ScalarInteger(hash->hash_buckets));
+      SET_STRING_ELT(DBstatnames,  7, mkChar("hash_buckets"));
+      SET_VECTOR_ELT(DBstat,  8, ScalarInteger(hash->hash_free));
+      SET_STRING_ELT(DBstatnames,  8, mkChar("hash_free"));
+      SET_VECTOR_ELT(DBstat,  9, ScalarInteger(hash->hash_bfree));
+      SET_STRING_ELT(DBstatnames,  9, mkChar("hash_bfree"));
+      SET_VECTOR_ELT(DBstat, 10, ScalarInteger(hash->hash_bigpages));
+      SET_STRING_ELT(DBstatnames,  10, mkChar("hash_bigpages"));
+      SET_VECTOR_ELT(DBstat, 11, ScalarInteger(hash->hash_big_bfree));
+      SET_STRING_ELT(DBstatnames,  11, mkChar("hash_big_bfree"));
+      SET_VECTOR_ELT(DBstat, 12, ScalarInteger(hash->hash_overflows));
+      SET_STRING_ELT(DBstatnames,  12, mkChar("hash_overflows"));
+      SET_VECTOR_ELT(DBstat, 13, ScalarInteger(hash->hash_ovfl_free));
+      SET_STRING_ELT(DBstatnames,  13, mkChar("hash_ovfl_free"));
+      SET_VECTOR_ELT(DBstat, 14, ScalarInteger(hash->hash_dup));
+      SET_STRING_ELT(DBstatnames,  14, mkChar("hash_dup"));
+      SET_VECTOR_ELT(DBstat, 15, ScalarInteger(hash->hash_dup_free));
+      SET_STRING_ELT(DBstatnames,  15, mkChar("hash_dup_free"));
+    case DB_BTREE:
+    case DB_RECNO:
+      dbp->stat(dbp, txnid, &bt, flags);
+      PROTECT(DBstat = allocVector(VECSXP,19));
+      PROTECT(DBstatnames = allocVector(STRSXP,19));
+      SET_VECTOR_ELT(DBstat,  0, ScalarInteger(bt->bt_magic));
+      SET_STRING_ELT(DBstatnames,  0, mkChar("bt_magic"));
+      SET_VECTOR_ELT(DBstat,  1, ScalarInteger(bt->bt_version));
+      SET_STRING_ELT(DBstatnames,  1, mkChar("bt_version"));
+      SET_VECTOR_ELT(DBstat,  2, ScalarInteger(bt->bt_nkeys));
+      SET_STRING_ELT(DBstatnames,  2, mkChar("bt_nkeys"));
+      SET_VECTOR_ELT(DBstat,  3, ScalarInteger(bt->bt_ndata));
+      SET_STRING_ELT(DBstatnames,  3, mkChar("bt_ndata"));
+      SET_VECTOR_ELT(DBstat,  4, ScalarInteger(bt->bt_pagecnt));
+      SET_STRING_ELT(DBstatnames,  4, mkChar("bt_pagecnt"));
+      SET_VECTOR_ELT(DBstat,  5, ScalarInteger(bt->bt_minkey));
+      SET_STRING_ELT(DBstatnames,  5, mkChar("bt_minkey"));
+      SET_VECTOR_ELT(DBstat,  6, ScalarInteger(bt->bt_re_len));
+      SET_STRING_ELT(DBstatnames,  6, mkChar("bt_re_len"));
+      SET_VECTOR_ELT(DBstat,  7, ScalarInteger(bt->bt_re_pad));
+      SET_STRING_ELT(DBstatnames,  7, mkChar("bt_re_pad"));
+      SET_VECTOR_ELT(DBstat,  8, ScalarInteger(bt->bt_levels));
+      SET_STRING_ELT(DBstatnames,  8, mkChar("bt_levels"));
+      SET_VECTOR_ELT(DBstat,  9, ScalarInteger(bt->bt_int_pg));
+      SET_STRING_ELT(DBstatnames,  9, mkChar("bt_int_pg"));
+      SET_VECTOR_ELT(DBstat, 10, ScalarInteger(bt->bt_leaf_pg));
+      SET_STRING_ELT(DBstatnames,  10, mkChar("bt_leaf_pg"));
+      SET_VECTOR_ELT(DBstat, 11, ScalarInteger(bt->bt_dup_pg));
+      SET_STRING_ELT(DBstatnames,  11, mkChar("bt_dup_pg"));
+      SET_VECTOR_ELT(DBstat, 12, ScalarInteger(bt->bt_over_pg));
+      SET_STRING_ELT(DBstatnames,  12, mkChar("bt_over_pg"));
+      SET_VECTOR_ELT(DBstat, 13, ScalarInteger(bt->bt_empty_pg));
+      SET_STRING_ELT(DBstatnames,  13, mkChar("bt_empty_pg"));
+      SET_VECTOR_ELT(DBstat, 14, ScalarInteger(bt->bt_free));
+      SET_STRING_ELT(DBstatnames,  14, mkChar("bt_free"));
+      SET_VECTOR_ELT(DBstat, 15, ScalarInteger(bt->bt_int_pgfree));
+      SET_STRING_ELT(DBstatnames,  15, mkChar("bt_int_pgfree"));
+      SET_VECTOR_ELT(DBstat, 16, ScalarInteger(bt->bt_leaf_pgfree));
+      SET_STRING_ELT(DBstatnames,  16, mkChar("bt_leaf_pgfree"));
+      SET_VECTOR_ELT(DBstat, 17, ScalarInteger(bt->bt_dup_pgfree));
+      SET_STRING_ELT(DBstatnames,  17, mkChar("bt_dup_pgfree"));
+      SET_VECTOR_ELT(DBstat, 18, ScalarInteger(bt->bt_over_pgfree));
+      SET_STRING_ELT(DBstatnames,  18, mkChar("bt_over_pgfree"));
+      break;
+    case DB_QUEUE:
+      dbp->stat(dbp, txnid, &qs, flags);
+      PROTECT(DBstat = allocVector(VECSXP,12));
+      PROTECT(DBstatnames = allocVector(STRSXP,12));
+      SET_VECTOR_ELT(DBstat,  0, ScalarInteger(qs->qs_magic));
+      SET_STRING_ELT(DBstatnames,  0, mkChar("qs_magic"));
+      SET_VECTOR_ELT(DBstat,  1, ScalarInteger(qs->qs_version));
+      SET_STRING_ELT(DBstatnames,  1, mkChar("qs_version"));
+      SET_VECTOR_ELT(DBstat,  2, ScalarInteger(qs->qs_nkeys));
+      SET_STRING_ELT(DBstatnames,  2, mkChar("qs_nkeys"));
+      SET_VECTOR_ELT(DBstat,  3, ScalarInteger(qs->qs_ndata));
+      SET_STRING_ELT(DBstatnames,  3, mkChar("qs_ndata"));
+      SET_VECTOR_ELT(DBstat,  4, ScalarInteger(qs->qs_pagesize));
+      SET_STRING_ELT(DBstatnames,  4, mkChar("qs_pagesize"));
+      SET_VECTOR_ELT(DBstat,  5, ScalarInteger(qs->qs_extentsize));
+      SET_STRING_ELT(DBstatnames,  5, mkChar("qs_extentsize"));
+      SET_VECTOR_ELT(DBstat,  6, ScalarInteger(qs->qs_pages));
+      SET_STRING_ELT(DBstatnames,  6, mkChar("qs_pages"));
+      SET_VECTOR_ELT(DBstat,  7, ScalarInteger(qs->qs_re_len));
+      SET_STRING_ELT(DBstatnames,  7, mkChar("qs_re_len"));
+      SET_VECTOR_ELT(DBstat,  8, ScalarInteger(qs->qs_re_pad));
+      SET_STRING_ELT(DBstatnames,  8, mkChar("qs_re_pad"));
+      SET_VECTOR_ELT(DBstat,  9, ScalarInteger(qs->qs_pgfree));
+      SET_STRING_ELT(DBstatnames,  9, mkChar("qs_pgfree"));
+      SET_VECTOR_ELT(DBstat, 10, ScalarInteger(qs->qs_first_recno));
+      SET_STRING_ELT(DBstatnames,  10, mkChar("qs_first_recno"));
+      SET_VECTOR_ELT(DBstat, 11, ScalarInteger(qs->qs_cur_recno));
+      SET_STRING_ELT(DBstatnames,  11, mkChar("qs_cur_recno"));
+      break;
+  }
+  setAttrib(DBstat, R_NamesSymbol, DBstatnames); 
+  UNPROTECT(2);
+  return(DBstat);   
+}
+/* }}} */
 /* {{{ rberkeley_db_stat_print */
 SEXP rberkeley_db_stat_print (SEXP _dbp, SEXP _flags)
 {
