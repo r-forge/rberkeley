@@ -479,13 +479,13 @@ upcoming RBerkeley version.
 \bibitem{R} R Development Core Team:
 \emph{R: A Language and Environment for Statistical Computing},
 R Foundation for Statistical Computing, Vienna, Austria.
-ISBN 3-900051-07-0, URL http://www.R-project.org
+ISBN 3-900051-07-0, URL \url{http://www.R-project.org}
 
 \bibitem{DB} Oracle Berkeley DB 4.7.25:
-http://www.oracle.com/technology/documentation/berkeley-db/db/index.html
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}
 
 \bibitem{API} Oracle Berkeley DB C API:
-http://www.oracle.com/technology/documentation/berkeley-db/db/api\_c/frame.html
+\url{http://www.oracle.com/technology/documentation/berkeley-db/db/api\_c/frame.html}
 
 \end{thebibliography}
 \end{document}
