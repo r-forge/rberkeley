@@ -16,7 +16,7 @@
 \tableofcontents
 
 \section{Overview}
-Berkeley DB is an embedded database application distributed
+Berkeley DB\cite{DB} is an embedded database application distributed
 by Oracle for use in open source and commercial applications.
 
 Widely deployed, Berkeley DB is used behind the scenes in
@@ -448,10 +448,23 @@ Then call the cursor delete function.
 <<dbcursordel>>=
 firstrecord <- dbcursor_get(dbc, flags=mkFlags("DB_FIRST"))[[1]]
 db_strerror(dbcursor_del(dbc))
-ret <- dbcursor_get(dbc, key=firstrecord$key, flags=mkFlags("DB_SET"))
-db_strerror(ret)
+dbcursor_get(dbc, key=firstrecord$key, flags=mkFlags("DB_SET"))
 @
 
+\subsection{Closing a Database}
+To ensure data integrity, in a persistant state, it is required
+to close a database and open cursors before exiting a session.
+
+A database needs to have no open cursors in it in order to
+be closed, so it is first important to close any outstanding
+cursors we have created. After that, we may simply call {\tt db\_close}
+on the open database handle.  A warning about being unable to use
+either cursor or database handle will be issued once the method is called.
+
+<<close>>=
+dbcursor_close(dbc)
+db_close(dbh)
+@
 \section{Conclusion}
 RBerkeley provides low-level API access to the Berkeley DB 
 embedded database library. While this document merely touched on
