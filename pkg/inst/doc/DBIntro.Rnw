@@ -29,7 +29,7 @@ include C, C++, Java and Tcl.  Contributed bindings exists
 in a variety of programming languages, including Perl, Python, and
 Ruby.
 
-RBerkeley adds an {\tt R} language binding to this pool of options.
+RBerkeley adds an {\tt R}~\cite{R} language binding to this pool of options.
 
 This document is not to extoll the virtues of DB, but rather to
 provide a quick start to using the {\tt R} interface.  The general design
@@ -114,7 +114,7 @@ db_strerror(ret)
 The {\tt db\_open} call opens the underlying database. As with db\_create,
 different parameters may be passed in. Some of these options will
 be covered in later documentation, but for now the defaults are sufficient.
-Users are directed to the official API for usage details.
+Users are directed to the official API\cite{API} for usage details.
 
 \vspace{3mm}
 \noindent
@@ -475,5 +475,18 @@ with the RBerkeley package.
 Testing, documentation, and further methods will be added in
 upcoming RBerkeley version.
 
+\begin{thebibliography}{99}
+\bibitem{R} R Development Core Team:
+\emph{R: A Language and Environment for Statistical Computing},
+R Foundation for Statistical Computing, Vienna, Austria.
+ISBN 3-900051-07-0, URL http://www.R-project.org
+
+\bibitem{DB} Oracle Berkeley DB 4.7.25:
+http://www.oracle.com/technology/documentation/berkeley-db/db/index.html
+
+\bibitem{API} Oracle Berkeley DB C API:
+http://www.oracle.com/technology/documentation/berkeley-db/db/api\_c/frame.html
+
+\end{thebibliography}
 \end{document}
 
