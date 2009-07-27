@@ -11,7 +11,7 @@ db_del <- function(dbh, txnid=NULL, key, flags=0L)
 {
   if(!is.raw(key))
     key <- serialize(key, NULL)
-  .Call("rberkeley_db_del", dbh, txnid, key, flags)
+  .Call("rberkeley_db_del", as.DB(dbh), txnid, key, flags)
 }
 
 db_open <- function(dbh, txnid=NULL, file="access.db",
