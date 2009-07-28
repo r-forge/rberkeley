@@ -785,6 +785,23 @@ SEXP  rberkeley_db_upgrade (SEXP _dbp, SEXP _file, SEXP _flags)
 
 /*** Database Configuration ***/
 /* {{{ rberkeley_db_set_alloc   */
+SEXP rberkeley_db_set_alloc (SEXP _dbp)
+{
+  /* This function allows for memory
+     from the R process to used for DB
+     data.  Not entirely sure of how to
+     do this yet, but this is a start... */
+
+  DB *dbp;
+  int ret;
+
+  dbp = R_ExternalPtrAddr(_dbp);
+  if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+    error("invalid 'db' handle");
+  ret = dbp->set_alloc(dbp, malloc, realloc, free);
+   
+  return ScalarInteger(ret);
+}
 /* }}} */
 /* {{{ rberkeley_db_set_cachesize */
 SEXP rberkeley_db_set_cachesize (SEXP _dbp, SEXP _gbytes,

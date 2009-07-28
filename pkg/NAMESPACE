@@ -9,6 +9,7 @@ export(
         ### Cursor ###
         db_cursor,
         dbcursor_close,
+        dbcursor_count,
         dbcursor_del,
         dbcursor_dup,
         dbcursor_get,
