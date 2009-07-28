@@ -72,7 +72,25 @@ SEXP rberkeley_dbtxn_abort (SEXP _tid) {
   return ScalarInteger(ret);
 }
 /* }}} */
-/* rberkeley_dbtxn_commit */
+/* {{{ rberkeley_dbtxn_commit */
+SEXP rberkeley_dbtxn_commit (SEXP _tid, SEXP _flags) {
+  DB_TXN *tid;
+  u_int32_t flags;
+  int ret;
+
+  tid = R_ExternalPtrAddr(_tid);
+  if(R_ExternalPtrTag(_tid) != RBerkeley_DB_TXN || tid == NULL)
+    error("invalid 'dbtxn' handle");
+  flags = (u_int32_t)INTEGER(_flags)[0];
+
+  ret = tid->commit(tid, flags);
+    
+  warning("'txnid' may not be accessed again");
+  R_ClearExternalPtr(_tid);
+
+  return ScalarInteger(ret);
+}
+/* }}} */
 /* rberkeley_dbtxn_discard */
 /* {{{ rberkeley_dbtxn_id */
 SEXP rberkeley_dbtxn_id (SEXP _tid) {

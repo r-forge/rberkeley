@@ -1,6 +1,11 @@
 \name{RBerkeley-package}
 \alias{RBerkeley}
 \alias{rberkeley}
+\alias{db_stat}
+\alias{dbenv_txn_begin}
+\alias{dbenv_txn_stat_print}
+\alias{dbtxn_abort}
+\alias{dbtxn_id}
 \Rdversion{1.1}
 \alias{RBerkeley-package}
 \docType{package}
