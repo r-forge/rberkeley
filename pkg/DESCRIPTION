@@ -1,8 +1,8 @@
 Package: RBerkeley
 Type: Package
 Title: R API to Oracle Berkeley DB
-Version: 0.0-1
-Date: 2009-07-10
+Version: 0.7-0
+Date: 2009-08-11
 Author: Jeffrey A. Ryan
 SystemRequirements: BerkeleyDB 4.7.25
 Maintainer: Jeffrey A. Ryan <jeff.a.ryan@gmail.com>

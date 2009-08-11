@@ -5,7 +5,7 @@
 # Licensed under GNU GPL
 
 # The version set here will propagate to other files from here
-AC_INIT(RBerkeley, 0.0-1)
+AC_INIT(RBerkeley, 0.7-0)
 
 # Checks for common programs using default macros
 AC_PROG_CC

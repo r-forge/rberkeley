@@ -73,7 +73,7 @@ may need to alter your configuration files to build RBerkeley.
 Installing RBerkeley follows the standard R installation convention
 of:
 
-{\tt R CMD INSTALL RBerkeley\_0.0-1.tar.gz}
+{\tt R CMD INSTALL RBerkeley\_0.7-0.tar.gz}
 
 
 \noindent

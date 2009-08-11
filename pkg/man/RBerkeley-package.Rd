@@ -6,6 +6,7 @@
 \alias{dbenv_txn_stat_print}
 \alias{dbtxn_abort}
 \alias{dbtxn_id}
+\alias{dbtxn_commit}
 \Rdversion{1.1}
 \alias{RBerkeley-package}
 \docType{package}
