@@ -1,124 +1,117 @@
-# Process this file with autoconf to produce a configure script.
-#
-# Configure.in for RBerkeley
-# Copyright (C) 2009 Dirk Eddelbuettel and Jeff Ryan 
-# Licensed under GNU GPL
+# Configuration file based on RMySQL package configure.in
+# written by J Horner.
+# Additional insight provided by Dirk Eddelbuettel.
+# All bad form/function is solely the work of Jeff Ryan
 
-# The version set here will propagate to other files from here
 AC_INIT(RBerkeley, 0.7-0)
 
-# Checks for common programs using default macros
 AC_PROG_CC
 
-# We default these to being empty for systems where db.h 
-# and libdb are found in standard places
-#DB_CFLAGS=""
-#DB_LIBS="-ldb"
-#
-## Use standard test for db.h
-#AC_CHECK_HEADER([db.h], [db_h=1], [db_h=0])
-#
-## If found, good; else do more work
-#if test $db_h == 1; then
-#    AC_MSG_NOTICE([db.h found as a system header -- all is well. Unles we're on OS X])
-#else 
-#    #AC_MSG_ERROR([db.h not found. Please install the Oracle Berkely DB]")
-#    AC_MSG_NOTICE([db.h not found. Looking at configure switch --with-db-include.])
-#
-#    # offer configure argument support for dieharder includes
-#    AC_ARG_WITH([db-include],
-#            AC_HELP_STRING([--with-db-include=INCLUDE_PATH],
-#                           [Use this location for Oracle Berkeley DB header file]),
-#            [db_include_path=$withval],
-#            [db_include_path=""])
-#
-#    if test [ -n "$db_include_path" ]; then
-#        if test -f ${db_include_path}/db.h; then 
-#	    DB_INCDIR="$db_include_path"
-#	    DB_CFLAGS="-I${DB_INCDIR} "
-#        else
-#    	    AC_MSG_ERROR([db.h not found in ${db_include_path}. Please correct this and try again.])
-#        fi
-#    else 
-#    	AC_MSG_ERROR([db.h not found and no directory submitted. Please install the Oracle Berkely DB and/or set the configure switch.])
-#    fi
-#
-#fi
-#
+AC_CHECK_LIB(c,getopt_long,
+             HAVE_GETOPT_LONG="yes",
+             HAVE_GETOPT_LONG="no")
 
-# Check for db.h in a few odd locations
-AC_MSG_NOTICE([checking for db.h in standard locations])
-for dir in \
-    /usr/local/BerkeleyDB.4.7/include \
-    /usr/include \
-    /usr/local/include \
-    /opt/include 
-do
-    if test -f ${dir}/db.h
-    then 
-        DB_INCDIR=${dir}
-	break
+AC_CHECK_LIB(db,
+             HAVE_BDB_LIB="yes",
+             HAVE_BDB_LIB="")
+
+AC_CHECK_HEADERS(db.h,
+                 HAVE_BDB_INC="yes",
+                 HAVE_BDB_INC="")
+
+AC_ARG_WITH(berkeleydb-dir,
+            [--with-berkeleydb-dir=BDB_DIR specifies existing Berkeley DB base dir],
+            BDB_DIR="${with_berkeleydb_dir}")
+AC_ARG_WITH(berkeleydb-inc,
+            [--with-berkeleydb-inc=BDB_INC specifies existing Berkeley DB include dir],
+            BDB_INC="${with_berkeleydb_inc}")
+AC_ARG_WITH(berkeleydb-lib,
+            [--with-berkeleydb-lib=BDB_LIB specifies existing Berkeley DB lib dir],
+            BDB_LIB="${with_berkeleydb_lib}")
+
+test "${BDB_DIR}" = "yes" -o "${BDB_DIR}" = "no" && BDB_DIR=""
+test "${BDB_INC}" = "yes" -o "${BDB_INC}" = "no" && BDB_INC=""
+test "${BDB_LIB}" = "yes" -o "${BDB_LIB}" = "no" && BDB_LIB=""
+
+if test -n "${BDB_DIR}" ; then
+   test ! -d "${BDB_DIR}" && AC_MSG_ERROR([dir ${BDB_DIR} does not exist])
+   test -z "${BDB_INC}" -a -d "${BDB_DIR}/include" && \
+              BDB_INC="${BDB_DIR}/include"
+   test -z "${BDB_LIB}" -a -d "${BDB_DIR}/lib" && \
+              BDB_LIB="${BDB_DIR}/lib"
+fi
+echo "BDB_LIB: ${BDB_LIB}"
+echo "BDB_INC: ${BDB_INC}"
+echo "PKG_LIBS: ${PKG_LIBS}"
+echo "PKG_CPPFLAGS: ${PKG_CPPFLAGS}"
+
+# Make sure that we are not clobbering PKG_* var settings
+if test -z "{$PKG_LIBS}" ; then
+  if test -n "${BDB_LIB}" ; then
+    PKG_LIBS="-L${BDB_LIB} -ldb"
+  else
+    test -n "${HAVE_BDB_LIB}" && PKG_LIBS="-ldb"
+  fi
+fi
+
+if test -z "${PKG_CPPFLAGS}" ; then
+  if test -n "${BDB_INC}" ; then
+    PKG_CPPFLAGS="-I${BDB_INC}"
+    FOUND_INC="yes"
+  else
+    if test -n "${HAVE_BDB_INC}" ; then
+      PKG_CPPFLAGS=""
+      FOUND_INC="yes"
+    else
+      PKG_CPPFLAGS=""
+      FOUND_INC="no"
     fi
-done
+  fi
+fi 
 
-# Test for sanity by looking for libdb
-# no explicit action on found, error on failure
-AC_CHECK_FILE(["${DB_INCDIR}/db.h"],
-	,
-	AC_MSG_ERROR([File db.h not in ${DB_INCDIR}.]))
 
-## Check for libdb
-#AC_SEARCH_LIBS([db_version], [db], [have_libdb=1], [have_libdb=0])
-#
-## If found, good; else more work
-#if test $have_libdb == 1; then
-#    AC_MSG_NOTICE([libdb found. All is well. Unless, well, yes. That again.])
-#else 
-#    AC_MSG_NOTICE([libdb not found. Looking at configure switch --with-db-lib.])
-#
-#    # offer configure argument support for dieharder includes
-#    AC_ARG_WITH([db-lib],
-#            AC_HELP_STRING([--with-db-lib=LIBRARY_PATH],
-#                           [Use this location for Oracle Berkeley DB library]),
-#            [db_lib_path=$withval],
-#            [db_lib_path=""])
-#
-#    if test [ -n "$db_lib_path" ]; then
-#	DB_LIBDIR="$db_lib_path"
-#	DB_LIBS="-L${DB_LIBDIR} -ldb"
-#    else 
-#    	AC_MSG_ERROR([libdb not found and no directory submitted. Please install the Oracle Berkely DB and/or set the configure switch.])
-#    fi
-#
-#fi
+if test "${HAVE_GETOPT_LONG}" = "no" ; then
+   PKG_CPPFLAGS="${PKG_CPPFLAGS} -DHAVE_GETOPT_LONG=0 "
+fi
 
-# Now search for BerkeleyDB.4.7 directory
-AC_MSG_NOTICE([checking for DB library file])
-for dir in \
-    /usr/local/BerkeleyDB.4.7/lib \
-	/usr/lib \
-	/usr/local/lib \
-	/opt/lib/  
-do
-    if test -f ${dir}/libdb.so || test -f ${dir}/libdb-4.7.dylib 
-	then 
-	    DB_LIBDIR=${dir}
-	    break
-	fi
-done
+if test -z "${HAVE_BDB_LIB}" -a -z "${PKG_LIBS}" ; then
+  for dir in /usr/local/BerkeleyDB.4.7/lib /usr/local/lib64 /usr/lib64 \
+             /usr/local/lib /usr/lib /opt/lib
+  do  unset ac_cv_lib_db
+echo "$dir"
+      AC_CHECK_LIB(db,db_version,
+                    HAVE_BDB_LIB="${dir}",
+                    HAVE_BDB_LIB="",
+                    [-L${dir}])
+      if test -n "{HAVE_BDB_LIB}" ; then
+         echo "            libdb found in -L${HAVE_BDB_LIB}"
+         PKG_LIBS="-L${HAVE_BDB_LIB} -ldb"
+         break
+      fi
+  done
+fi
+# headers
+if test -z "{$HAVE_BDB_INC}" -a -z "${PKG_CPPFLAGS}" ; then
+  for dir in /usr/local/BerkeleyDB.4.7/include \
+             /usr/include /usr/local/include /opt/include /include
+  do
+      AC_CHECK_HEADER(${dir}/db.h,
+                      HAVE_BDB_INC="${dir}",
+                      HAVE_BDB_INC="")
+      if test -n "${HAVE_BDB_INC}" ; then
+        PKG_CPPFLAGS="-I${HAVE_BDB_INC}"
+        FOUND_INC="yes"
+        break
+      fi
+  done
+fi        
 
-# Test for sanity by looking for libdb.so, 
-# no explicit action on found, error on failure
-#AC_CHECK_FILE(["${DB_LIBDIR}/libdb.so"],
-#	,
-#	AC_MSG_ERROR([Library libdb.so not in ${DH_LIBDIR}.]))
+AC_SUBST(PKG_CPPFLAGS)
+AC_SUBST(PKG_LIBS)
 
-# Expand into arguments
-DB_CFLAGS="-I${DB_INCDIR} "
-DB_LIBS="-L${DB_LIBDIR} -ldb"
-
-# Now substitute these variables in src/Makevars.in to create src/Makevars
-AC_SUBST(DB_CFLAGS)
-AC_SUBST(DB_LIBS)
 AC_OUTPUT(src/Makevars)
- 
+
+
+
+
+
