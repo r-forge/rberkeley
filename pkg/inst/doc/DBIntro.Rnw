@@ -94,7 +94,9 @@ use case.
 Here we create a new database handle, and open our test database.
 <<loadRBerkeley, echo=FALSE>>=
 library(RBerkeley)
-system("rm myDB.db")
+if(file.exists("myDB.db")) {
+  unlink("myDB.db")
+}
 @
 
 <<dbopen, keep.source=FALSE>>=
