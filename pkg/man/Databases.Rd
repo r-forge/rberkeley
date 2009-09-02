@@ -38,6 +38,7 @@
 \alias{db_set_lorder}
 \alias{db_set_pagesize}
 % these aren't documented yet
+\alias{db_set_re_source}
 \alias{db_get_cachesize}
 \alias{db_get_dbname}
 \alias{db_get_encrypt_flags}

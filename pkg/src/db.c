@@ -1104,6 +1104,21 @@ SEXP rberkeley_db_set_bt_minkey (SEXP _dbp, SEXP _minkey) {
 /* rberkeley_db_set_re_len */
 /* rberkeley_db_set_re_pad */
 /* rberkeley_db_set_re_source */
+SEXP rberkeley_db_set_re_source (SEXP _dbp, SEXP _source) {
+	DB *dbp;
+	char *source;
+	int ret;
+
+	dbp = R_ExternalPtrAddr(_dbp);
+	if(R_ExternalPtrTag(_dbp) != RBerkeley_DB || dbp == NULL)
+	    error("invalid 'db' handle");
+
+    source = CHAR(STRING_ELT(_source,0));
+
+    ret = dbp->set_re_source(dbp,source);
+
+    return ScalarInteger(ret);
+}
 
 /*** Hash Configuration ***/    
 /* rberkeley_db_set_h_compare */

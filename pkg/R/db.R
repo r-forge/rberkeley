@@ -232,3 +232,14 @@ db_set_msgfile <- function(dbh, msgfile)
   }
   .Call("rberkeley_db_set_msgfile", dbh, msgfile)
 }
+
+db_set_re_source <- function(dbh, source)
+{
+	if(!file.exists(source)) {
+		stop(paste("could not set_re_source source to file",source))
+	}
+	.Call("rberkeley_db_set_re_source", 
+			as.DB(dbh), 
+			as.character(source))
+}
+

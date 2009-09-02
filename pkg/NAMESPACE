@@ -48,6 +48,7 @@ export(
         db_get_errpfx,
         db_set_errfile,
         db_set_msgfile,
+        db_set_re_source,
 
         db_get_byteswapped,
         db_stat,
