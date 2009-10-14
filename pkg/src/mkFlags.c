@@ -553,9 +553,11 @@ SEXP mkFlags (SEXP _flags)
     if(strcmp(cur_string,"DB_WRITEOPEN")==0) {
       flags_bit = flags_bit | DB_WRITEOPEN; continue; 
     }  else
-    if(strcmp(cur_string,"DB_XA_CREATE")==0) {
-      flags_bit = flags_bit | DB_XA_CREATE; continue; 
-    }  else
+/* removed in 4.8
+//    if(strcmp(cur_string,"DB_XA_CREATE")==0) {
+//      flags_bit = flags_bit | DB_XA_CREATE; continue; 
+//    }  else
+*/
     if(strcmp(cur_string,"DB_YIELDCPU")==0) {
       flags_bit = flags_bit | DB_YIELDCPU; continue; 
     }  else
