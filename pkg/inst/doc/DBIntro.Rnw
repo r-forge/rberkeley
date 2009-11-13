@@ -471,7 +471,7 @@ db_close(dbh)
 RBerkeley provides low-level API access to the Berkeley DB 
 embedded database library. While this document merely touched on
 basic usage, a full suite of API functionality is available
-to the R user via the 70+ functions currently shipped
+to the R user via the 80+ functions currently shipped
 with the RBerkeley package.
 
 Testing, documentation, and further methods will be added in
