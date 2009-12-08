@@ -6,6 +6,9 @@ export(
         db_version,
         db_strerror,
 
+        ### DBT ###
+        DBT,
+
         ### Cursor ###
         db_cursor,
         dbcursor_close,
@@ -33,7 +36,7 @@ export(
         db_exists,
         db_del,
         db_put,
-        db_get,
+        db_get, db_getP, # experimental partial get. See DBT
         db_key_range,
 
         db_set_cachesize,

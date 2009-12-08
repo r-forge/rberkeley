@@ -1,3 +1,7 @@
+DBT <- function(data=NULL,size=NULL,ulen=NULL,dlen=NULL,doff=NULL,flags=NULL) {
+  structure(list(data,size,ulen,dlen,doff,flags),class="DBT")
+}
+
 db_create <- function(dbenv=NULL, flags=0L) {
   structure(0, conn_id=.Call("rberkeley_db_create", dbenv, flags), class="DB")
 }
@@ -84,6 +88,21 @@ db_get <- function(dbh, txnid=NULL, key, data=NULL, flags=0L)
 
   # should add error checking here... 
   .Call("rberkeley_db_get", as.DB(dbh), txnid, key, data, as.integer(flags))
+}
+
+db_getP <- function(dbh, txnid=NULL, key, data=NULL, flags=0L)
+{
+  if(!is.raw(key))
+    key <- serialize(key, NULL)
+
+  if(!inherits(data,"DBT")) {
+    if(!is.null(data) && !is.raw(data))
+      data <- serialize(data,NULL)
+    data <- DBT(data)
+  }
+
+  # should add error checking here... 
+  .Call("rberkeley_db_getP", as.DB(dbh), txnid, key, data, as.integer(flags))
 }
 
 db_key_range <- function(dbh, txnid=NULL, key, flags=0L)

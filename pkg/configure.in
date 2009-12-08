@@ -40,10 +40,6 @@ if test -n "${BDB_DIR}" ; then
    test -z "${BDB_LIB}" -a -d "${BDB_DIR}/lib" && \
               BDB_LIB="${BDB_DIR}/lib"
 fi
-echo "BDB_LIB: ${BDB_LIB}"
-echo "BDB_INC: ${BDB_INC}"
-echo "PKG_LIBS: ${PKG_LIBS}"
-echo "PKG_CPPFLAGS: ${PKG_CPPFLAGS}"
 
 # Make sure that we are not clobbering PKG_* var settings
 if test -z "{$PKG_LIBS}" ; then
@@ -79,7 +75,6 @@ if test -z "${HAVE_BDB_LIB}" -a -z "${PKG_LIBS}" ; then
   for dir in /usr/local/lib64 /usr/lib64 \
              /usr/local/lib /usr/lib /opt/lib
   do  unset ac_cv_lib_db
-echo "$dir"
       AC_CHECK_LIB(db,db_version,
                     HAVE_BDB_LIB="${dir}",
                     HAVE_BDB_LIB="",

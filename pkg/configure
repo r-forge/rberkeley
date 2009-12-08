@@ -3663,10 +3663,6 @@ $as_echo "$as_me: error: dir ${BDB_DIR} does not exist" >&2;}
    test -z "${BDB_LIB}" -a -d "${BDB_DIR}/lib" && \
               BDB_LIB="${BDB_DIR}/lib"
 fi
-echo "BDB_LIB: ${BDB_LIB}"
-echo "BDB_INC: ${BDB_INC}"
-echo "PKG_LIBS: ${PKG_LIBS}"
-echo "PKG_CPPFLAGS: ${PKG_CPPFLAGS}"
 
 # Make sure that we are not clobbering PKG_* var settings
 if test -z "{$PKG_LIBS}" ; then
@@ -3702,7 +3698,6 @@ if test -z "${HAVE_BDB_LIB}" -a -z "${PKG_LIBS}" ; then
   for dir in /usr/local/lib64 /usr/lib64 \
              /usr/local/lib /usr/lib /opt/lib
   do  unset ac_cv_lib_db
-echo "$dir"
       { $as_echo "$as_me:$LINENO: checking for db_version in -ldb" >&5
 $as_echo_n "checking for db_version in -ldb... " >&6; }
 if test "${ac_cv_lib_db_db_version+set}" = set; then

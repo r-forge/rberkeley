@@ -657,6 +657,24 @@ SEXP mkFlags (SEXP _flags)
     }  else
     if(strcmp(cur_string,"DB_PRIORITY_VERY_HIGH")==0) {
       flags_bit = flags_bit | DB_PRIORITY_VERY_HIGH; continue; 
+    } else 
+    if(strcmp(cur_string,"DB_DBT_MALLOC")==0) {
+      flags_bit = flags_bit | DB_DBT_MALLOC; continue; 
+    } else
+    if(strcmp(cur_string,"DB_DBT_REALLOC")==0) {
+      flags_bit = flags_bit | DB_DBT_REALLOC; continue; 
+    } else
+    if(strcmp(cur_string,"DB_DBT_USERMEM")==0) {
+      flags_bit = flags_bit | DB_DBT_USERMEM; continue; 
+    } else
+    if(strcmp(cur_string,"DB_DBT_PARTIAL")==0) {
+      flags_bit = flags_bit | DB_DBT_PARTIAL; continue; 
+    } else
+    if(strcmp(cur_string,"DB_DBT_APPMALLOC")==0) {
+      flags_bit = flags_bit | DB_DBT_APPMALLOC; continue; 
+    } else
+    if(strcmp(cur_string,"DB_DBT_MULTIPLE")==0) {
+      flags_bit = flags_bit | DB_DBT_MULTIPLE; continue; 
     } else {
       warning("unknown constant %s", cur_string);
     }
