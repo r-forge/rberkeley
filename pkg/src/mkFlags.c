@@ -350,7 +350,8 @@ SEXP mkFlags (SEXP _flags)
       flags_bit = flags_bit | DB_REP_CONF_LEASE; continue; 
     }  else
     if(strcmp(cur_string,"DB_REP_CONF_NOAUTOINIT")==0) {
-      flags_bit = flags_bit | DB_REP_CONF_NOAUTOINIT; continue; 
+      /*flags_bit = flags_bit | DB_REP_CONF_NOAUTOINIT; continue; db-5.0 change*/
+      flags_bit = flags_bit | DB_REP_CONF_AUTOINIT; continue; 
     } else
     if(strcmp(cur_string,"DB_REP_CONF_NOWAIT")==0) {
       flags_bit = flags_bit | DB_REP_CONF_NOWAIT; continue; 
