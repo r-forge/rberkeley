@@ -51,6 +51,7 @@
 \alias{db_stat_print}
 \alias{db_strerror}
 \alias{db_version}
+\alias{db_full_version}
 
 \title{
 BerkeleyDB Database Operations and Methods

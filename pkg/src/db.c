@@ -38,6 +38,37 @@ SEXP rberkeley_db_version ()
   return Version;
 }
 /* }}} */
+/* {{{ rberkeley_db_full_version */
+SEXP rberkeley_db_full_version ()
+{
+  int family, release, major, minor, patch;
+  major = minor = patch = 1;
+  char *version;
+
+  version = db_full_version(&family, &release, &major, &minor, &patch);
+
+  SEXP Version, names;
+  PROTECT(Version = allocVector(VECSXP, 6));
+  SET_VECTOR_ELT(Version, 0, mkString(version));
+  SET_VECTOR_ELT(Version, 1, ScalarInteger(family));
+  SET_VECTOR_ELT(Version, 2, ScalarInteger(release));
+  SET_VECTOR_ELT(Version, 3, ScalarInteger(major));
+  SET_VECTOR_ELT(Version, 4, ScalarInteger(minor));
+  SET_VECTOR_ELT(Version, 5, ScalarInteger(patch));
+
+  PROTECT(names = allocVector(STRSXP, 6));
+  SET_STRING_ELT(names, 0, mkChar("Version")); 
+  SET_STRING_ELT(names, 1, mkChar("family")); 
+  SET_STRING_ELT(names, 2, mkChar("release")); 
+  SET_STRING_ELT(names, 3, mkChar("major")); 
+  SET_STRING_ELT(names, 4, mkChar("minor")); 
+  SET_STRING_ELT(names, 5, mkChar("patch")); 
+  
+  setAttrib(Version, R_NamesSymbol, names);
+  UNPROTECT(2);
+  return Version;
+}
+/* }}} */
 /* {{{ rberkeley_db_strerror */
 SEXP rberkeley_db_strerror (SEXP _error)
 {

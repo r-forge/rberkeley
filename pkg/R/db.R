@@ -211,6 +211,11 @@ db_version <- function()
   .Call("rberkeley_db_version")
 }
 
+db_full_version <- function() 
+{
+  .Call("rberkeley_db_full_version")
+}
+
 db_get_dbname <- function(dbh)
 {
   .Call("rberkeley_db_get_dbname", as.DB(dbh))

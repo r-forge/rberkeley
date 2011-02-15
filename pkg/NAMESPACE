@@ -4,6 +4,7 @@ export(
         ### Utility ###
         mkFlags,
         db_version,
+        db_full_version,
         db_strerror,
 
         ### DBT ###
