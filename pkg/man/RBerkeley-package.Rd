@@ -48,7 +48,7 @@ with an asterisk next to them are currently not available in the \R API.
 Jeffrey A. Ryan
 }
 \references{
-Oracle Berkey DB 4.7.25\cr
+Oracle Berkey DB 11gR2\cr
 \url{http://www.oracle.com/technology/documentation/berkeley-db/db/index.html}
 }
 \keyword{ package }

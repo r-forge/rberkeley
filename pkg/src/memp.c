@@ -15,7 +15,7 @@
 SEXP rberkeley_db_get_mpf (SEXP _dbp)
 {
   DB *dbp;
-  DB_MPOOLFILE *mpf;
+  /*DB_MPOOLFILE *mpf;*/
 
   dbp = R_ExternalPtrAddr(_dbp);
   return R_MakeExternalPtr(dbp->get_mpf(dbp), R_NilValue, R_NilValue);

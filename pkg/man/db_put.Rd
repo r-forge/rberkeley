@@ -2,6 +2,7 @@
 \Rdversion{1.1}
 \alias{db_put}
 \alias{db_get}
+\alias{db_getP}
 \alias{dbcursor_put}
 \alias{dbcursor_get}
 %- Also NEED an '\alias' for EACH other topic documented here.

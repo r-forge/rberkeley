@@ -14,7 +14,6 @@
 
 SEXP mkFlags (SEXP _flags)
 {
-  SEXP flags;
   char * cur_string;
   int len_flags = length(_flags);
   u_int32_t flags_bit=0x0;
@@ -349,9 +348,13 @@ SEXP mkFlags (SEXP _flags)
     if(strcmp(cur_string,"DB_REP_CONF_LEASE")==0) {
       flags_bit = flags_bit | DB_REP_CONF_LEASE; continue; 
     }  else
+#ifdef DB_REP_CONF_NOAUTOINIT
     if(strcmp(cur_string,"DB_REP_CONF_NOAUTOINIT")==0) {
-      /*flags_bit = flags_bit | DB_REP_CONF_NOAUTOINIT; continue; db-5.0 change*/
-      flags_bit = flags_bit | DB_REP_CONF_AUTOINIT; continue; 
+      flags_bit = flags_bit | DB_REP_CONF_NOAUTOINIT; continue; 
+#else
+    if(strcmp(cur_string,"DB_REP_CONF_AUTOINIT")==0) {
+      flags_bit = flags_bit | DB_REP_CONF_AUTOINIT; continue; /*db-5.0 change*/
+#endif
     } else
     if(strcmp(cur_string,"DB_REP_CONF_NOWAIT")==0) {
       flags_bit = flags_bit | DB_REP_CONF_NOWAIT; continue; 
@@ -378,7 +381,11 @@ SEXP mkFlags (SEXP _flags)
       flags_bit = flags_bit | DB_RMW; continue; 
     }  else
     if(strcmp(cur_string,"DB_RPCCLIENT")==0) {
+#ifdef DB_RPCCLIENT
       flags_bit = flags_bit | DB_RPCCLIENT; continue; 
+#else
+      warning("DB_RPCCLIENT flag not supported");
+#endif
     }  else
     if(strcmp(cur_string,"DB_SALVAGE")==0) {
       flags_bit = flags_bit | DB_SALVAGE; continue; 
@@ -554,11 +561,11 @@ SEXP mkFlags (SEXP _flags)
     if(strcmp(cur_string,"DB_WRITEOPEN")==0) {
       flags_bit = flags_bit | DB_WRITEOPEN; continue; 
     }  else
-/* removed in 4.8
-//    if(strcmp(cur_string,"DB_XA_CREATE")==0) {
-//      flags_bit = flags_bit | DB_XA_CREATE; continue; 
-//    }  else
-*/
+#ifdef DB_XA_CREATE /* removed in 4.8 */
+    if(strcmp(cur_string,"DB_XA_CREATE")==0) {
+      flags_bit = flags_bit | DB_XA_CREATE; continue; 
+    }  else
+#endif
     if(strcmp(cur_string,"DB_YIELDCPU")==0) {
       flags_bit = flags_bit | DB_YIELDCPU; continue; 
     }  else

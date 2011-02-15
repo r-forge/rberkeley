@@ -36,7 +36,6 @@ SEXP rberkeley_db_get_env (SEXP _dbp)
 {
   DB *dbp;
   DB_ENV *dbenv;
-  int ret;
 
   dbp = R_ExternalPtrAddr(_dbp);
   if(R_ExternalPtrTag(_dbp) != install("DB") || dbp == NULL)
@@ -156,8 +155,7 @@ SEXP rberkeley_dbenv_open (SEXP _dbenv, SEXP _db_home, SEXP _flags, SEXP _mode)
 {
   DB_ENV *dbenv;
   u_int32_t flags;
-  const char * dbhome;
-  int mode, ret;
+  int ret;
 
   flags = (u_int32_t)INTEGER(_flags)[0];
 
